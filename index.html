@@ -374,6 +374,36 @@ window.addEventListener('load', () => {
 </head>
 <body>
 
+<script>
+// Early auth functions - defined before main script loads
+function showAuth(tab) {
+  var lp = document.getElementById('landingPage');
+  var as = document.getElementById('authScreen');
+  var ap = document.getElementById('appScreen');
+  if(lp) lp.style.display = 'none';
+  if(as) as.style.display = 'flex';
+  if(ap) ap.style.display = 'none';
+  setTimeout(function() {
+    var tabs = document.querySelectorAll('.auth-tab');
+    if(tab === 'register' && tabs[1]) {
+      tabs.forEach(function(t){t.classList.remove('active');});
+      tabs[1].classList.add('active');
+      var lf = document.getElementById('loginForm');
+      var rf = document.getElementById('registerForm');
+      if(lf) lf.style.display = 'none';
+      if(rf) rf.style.display = 'block';
+    } else if(tabs[0]) {
+      tabs.forEach(function(t){t.classList.remove('active');});
+      tabs[0].classList.add('active');
+      var lf = document.getElementById('loginForm');
+      var rf = document.getElementById('registerForm');
+      if(lf) lf.style.display = 'block';
+      if(rf) rf.style.display = 'none';
+    }
+  }, 30);
+}
+</script>
+
 <!-- AUTH SCREEN -->
 
 <!-- LANDING PAGE -->
@@ -1892,13 +1922,9 @@ function doRegister() {
   startApp();
 }
 function doRegisterLocal(name, email, pass, ref) {
-  // name, email, pass, ref passed as params
-  const email = document.getElementById('regEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('regPass').value;
-  const ref = document.getElementById('regRef').value.trim().toUpperCase();
-  if (!name||!email||!pass) { showToast('⚠️','Error','Please fill all required fields'); return; }
-  if (pass.length < 8) { showToast('⚠️','Error','Password must be at least 8 characters'); return; }
-  if (USERS[email]) { showToast('⚠️','Error','This email is already registered'); return; }
+  if (!name||!email||!pass) { showToast('⚠️','Error','Please fill all fields'); return; }
+  if (pass.length < 6) { showToast('⚠️','Error','Password min 6 characters'); return; }
+  if (USERS[email]) { showToast('⚠️','Error','Email already registered'); return; }
   const refCode = 'EAM-' + Math.random().toString(36).substr(2,6).toUpperCase();
   USERS[email] = { pass, name, role:'user', capital:10000, points:ref?100:0, ref:refCode };
   if (ref) {

@@ -3,1164 +3,2047 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EAM Trading — منصة التداول الذكي</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Orbitron:wght@400;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<title>EAM Trading - منصة التداول الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #C9A84C; --gold-light: #F0D080; --gold-dark: #8B6914;
-  --red: #8B0000; --red-light: #C0392B;
-  --black: #050505; --black-2: #0D0D0D; --black-3: #141414; --black-4: #1A1A1A; --black-5: #222;
-  --white: #F5F0E8; --gray: #888; --green: #00C851; --red-s: #FF3B30; --yellow: #FFD600;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--black); color:var(--white); font-family:'Tajawal',sans-serif; overflow-x:hidden; }
-::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:var(--black-2); } ::-webkit-scrollbar-thumb { background:var(--gold-dark); border-radius:2px; }
+  :root {
+    --gold: #FFD700;
+    --gold2: #FFA500;
+    --red: #8B0000;
+    --red2: #CC0000;
+    --bg: #050505;
+    --bg2: #0a0a0a;
+    --bg3: #111111;
+    --bg4: #181818;
+    --border: rgba(255,215,0,0.15);
+    --text: #e8e8e8;
+    --text2: #999;
+    --green: #00c853;
+    --red-price: #ff3d3d;
+    --sidebar-w: 260px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
 
-/* AUTH SCREEN */
-.auth-screen { position:fixed; inset:0; background:var(--black); z-index:1000; display:flex; align-items:center; justify-content:center; }
-.auth-screen.hidden { display:none; }
-.auth-box { background:var(--black-3); border:1px solid rgba(201,168,76,0.2); border-radius:16px; padding:48px; width:420px; max-width:95vw; }
-.auth-logo { font-family:'Orbitron',monospace; font-size:24px; font-weight:900; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:8px; letter-spacing:3px; }
-.auth-sub { text-align:center; font-size:13px; color:var(--gray); margin-bottom:32px; }
-.auth-tabs { display:flex; margin-bottom:24px; background:var(--black-4); border-radius:8px; padding:4px; }
-.auth-tab { flex:1; padding:10px; text-align:center; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.3s; color:var(--gray); }
-.auth-tab.active { background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:var(--black); }
-.form-group { margin-bottom:16px; }
-.form-label { display:block; font-size:11px; letter-spacing:2px; color:var(--gold); margin-bottom:8px; }
-.form-input { width:100%; background:var(--black-4); border:1px solid rgba(201,168,76,0.2); border-radius:6px; padding:13px 16px; color:var(--white); font-family:'Tajawal',sans-serif; font-size:14px; transition:border-color 0.3s; }
-.form-input:focus { outline:none; border-color:var(--gold); }
-.btn-primary { width:100%; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:var(--black); border:none; padding:14px; border-radius:8px; font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:8px; }
-.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(201,168,76,0.3); }
-.btn-primary:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-.auth-error { background:rgba(255,59,48,0.1); border:1px solid rgba(255,59,48,0.3); border-radius:8px; padding:12px; font-size:13px; color:var(--red-s); margin-bottom:16px; display:none; text-align:center; }
-.auth-success { background:rgba(0,200,81,0.1); border:1px solid rgba(0,200,81,0.3); border-radius:8px; padding:12px; font-size:13px; color:var(--green); margin-bottom:16px; display:none; text-align:center; }
-.auth-divider { text-align:center; color:var(--gray); font-size:12px; margin:16px 0; position:relative; }
-.auth-divider::before, .auth-divider::after { content:''; position:absolute; top:50%; width:40%; height:1px; background:rgba(255,255,255,0.1); }
-.auth-divider::before { right:0; } .auth-divider::after { left:0; }
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:var(--bg2); }
+  ::-webkit-scrollbar-thumb { background:var(--gold); border-radius:3px; }
 
-/* LOADING */
-.loading-screen { position:fixed; inset:0; background:var(--black); z-index:999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
-.loading-screen.hidden { display:none; }
-.loading-logo { font-family:'Orbitron',monospace; font-size:28px; font-weight:900; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:4px; }
-.loading-spinner { width:40px; height:40px; border:3px solid rgba(201,168,76,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+  /* TICKER */
+  .ticker-bar {
+    background: linear-gradient(90deg, var(--red) 0%, #1a0000 50%, var(--red) 100%);
+    border-bottom: 1px solid var(--gold);
+    padding: 8px 0;
+    overflow: hidden;
+    position: fixed; top:0; left:0; right:0; z-index:1000;
+  }
+  .ticker-inner { display:flex; gap:40px; animation: tickerMove 30s linear infinite; white-space:nowrap; width:max-content; }
+  @keyframes tickerMove { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-item { display:flex; align-items:center; gap:8px; font-size:13px; font-family:'Rajdhani',sans-serif; font-weight:600; }
+  .ticker-item .coin-name { color:var(--gold); }
+  .ticker-item .price { color:white; }
+  .ticker-item .change.up { color:var(--green); }
+  .ticker-item .change.down { color:var(--red-price); }
 
-/* APP */
-.app { display:none; }
-.app.visible { display:block; }
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top:40px; right:0; bottom:0;
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, #0d0d0d 0%, #050505 100%);
+    border-left: 1px solid var(--border);
+    z-index:900; overflow-y:auto;
+    transition: transform 0.3s;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align:center;
+  }
+  .sidebar-logo .logo-text {
+    font-family:'Rajdhani',sans-serif;
+    font-size:26px; font-weight:700;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    letter-spacing:2px;
+  }
+  .sidebar-logo .logo-sub { font-size:10px; color:var(--text2); letter-spacing:3px; margin-top:2px; }
+  .user-info {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+  }
+  .user-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background: linear-gradient(135deg, var(--gold), var(--red2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:16px; color:black; flex-shrink:0;
+  }
+  .user-name { font-size:14px; font-weight:600; }
+  .user-level { font-size:11px; color:var(--gold); }
+  .sidebar-nav { padding: 12px 0; }
+  .nav-section { padding: 8px 20px 4px; font-size:10px; color:var(--text2); letter-spacing:2px; text-transform:uppercase; }
+  .nav-item {
+    display:flex; align-items:center; gap:12px;
+    padding: 11px 20px; cursor:pointer;
+    transition: all 0.2s; position:relative;
+    font-size:14px; color:var(--text2);
+    border-right: 3px solid transparent;
+  }
+  .nav-item:hover { background:rgba(255,215,0,0.05); color:var(--gold); }
+  .nav-item.active { background:rgba(255,215,0,0.08); color:var(--gold); border-right-color:var(--gold); }
+  .nav-item .icon { font-size:18px; width:22px; text-align:center; }
+  .nav-badge {
+    margin-right:auto; background:var(--red2); color:white;
+    font-size:10px; padding:2px 7px; border-radius:10px; font-weight:700;
+  }
 
-/* NAV */
-nav { position:fixed; top:0; left:0; right:0; z-index:500; display:flex; align-items:center; justify-content:space-between; padding:0 30px; height:62px; background:rgba(5,5,5,0.97); border-bottom:1px solid rgba(201,168,76,0.12); backdrop-filter:blur(20px); }
-.logo { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:3px; }
-.nav-right { display:flex; align-items:center; gap:16px; }
-.user-info { display:flex; align-items:center; gap:10px; }
-.user-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--black); }
-.user-email { font-size:12px; color:var(--gray); }
-.btn-logout { background:rgba(255,59,48,0.1); color:var(--red-s); border:1px solid rgba(255,59,48,0.2); padding:7px 14px; border-radius:6px; font-family:'Tajawal',sans-serif; font-size:12px; cursor:pointer; transition:all 0.3s; }
-.btn-logout:hover { background:rgba(255,59,48,0.2); }
-.live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; display:inline-block; margin-left:6px; }
+  /* MAIN CONTENT */
+  .main { margin-right: var(--sidebar-w); margin-top:40px; min-height:calc(100vh - 40px); }
+  .page { display:none; padding: 28px; animation: fadeIn 0.3s ease; }
+  .page.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-/* SIDEBAR */
-.sidebar { position:fixed; top:62px; right:0; bottom:0; width:220px; background:var(--black-2); border-left:1px solid rgba(201,168,76,0.08); z-index:400; overflow-y:auto; padding:16px 0; }
-.s-section { padding:0 12px; margin-bottom:20px; }
-.s-title { font-size:9px; letter-spacing:3px; color:var(--gold-dark); text-transform:uppercase; margin-bottom:10px; padding:0 8px; }
-.s-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:7px; cursor:pointer; transition:all 0.2s; font-size:13px; color:rgba(245,240,232,0.65); margin-bottom:3px; }
-.s-item:hover { background:rgba(201,168,76,0.07); color:var(--white); }
-.s-item.active { background:rgba(201,168,76,0.12); color:var(--gold); }
-.s-icon { font-size:15px; width:18px; text-align:center; }
+  /* PAGE HEADER */
+  .page-header { margin-bottom:28px; }
+  .page-header h1 { font-size:28px; font-weight:700; }
+  .page-header h1 span { background:linear-gradient(135deg,var(--gold),var(--gold2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .page-header p { color:var(--text2); font-size:14px; margin-top:4px; }
 
-/* MAIN */
-.main { margin-right:220px; margin-top:62px; min-height:calc(100vh - 62px); }
+  /* CARDS */
+  .card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(255,215,0,0.3); }
+  .card-title { font-size:13px; color:var(--text2); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .card-value { font-size:28px; font-weight:700; font-family:'Rajdhani',sans-serif; }
+  .card-change { font-size:12px; margin-top:4px; }
+  .card-change.up { color:var(--green); }
+  .card-change.down { color:var(--red-price); }
 
-/* TICKER */
-.ticker { background:var(--black-3); border-bottom:1px solid rgba(201,168,76,0.08); padding:9px 0; overflow:hidden; }
-.ticker-track { display:flex; gap:50px; animation:tickerAnim 40s linear infinite; white-space:nowrap; }
-@keyframes tickerAnim { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-.ticker-item { display:flex; align-items:center; gap:10px; font-family:'Orbitron',monospace; font-size:11px; }
-.ticker-name { color:var(--gold); font-weight:700; }
-.up { color:var(--green); } .down { color:var(--red-s); }
+  /* GRID */
+  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+  .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:24px; }
+  @media(max-width:1100px) { .grid-4{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:700px) { .grid-4,.grid-3,.grid-2{grid-template-columns:1fr} .sidebar{transform:translateX(100%)} .main{margin-right:0} }
 
-/* PAGES */
-.page { display:none; padding:24px 28px; }
-.page.active { display:block; }
-.page-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:4px; }
-.page-title .gold { color:var(--gold); }
-.page-sub { font-size:13px; color:var(--gray); margin-bottom:24px; }
+  /* MARKET CARDS */
+  .market-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+  @media(max-width:900px) { .market-grid{grid-template-columns:repeat(2,1fr)} }
+  .market-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:12px; padding:18px; cursor:pointer;
+    transition: all 0.3s; position:relative; overflow:hidden;
+  }
+  .market-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform:translateX(-100%); transition:transform 0.4s;
+  }
+  .market-card:hover { border-color:rgba(255,215,0,0.4); transform:translateY(-2px); }
+  .market-card:hover::before { transform:translateX(0); }
+  .mc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .mc-name { font-size:18px; font-weight:700; font-family:'Rajdhani',sans-serif; color:var(--gold); }
+  .mc-badge { font-size:10px; padding:3px 10px; border-radius:20px; font-weight:600; }
+  .mc-badge.buy { background:rgba(0,200,83,0.15); color:var(--green); border:1px solid rgba(0,200,83,0.3); }
+  .mc-badge.sell { background:rgba(255,61,61,0.15); color:var(--red-price); border:1px solid rgba(255,61,61,0.3); }
+  .mc-badge.wait { background:rgba(255,215,0,0.1); color:var(--gold); border:1px solid rgba(255,215,0,0.3); }
+  .mc-price { font-size:24px; font-weight:700; font-family:'Rajdhani',sans-serif; margin-bottom:4px; }
+  .mc-change { font-size:13px; }
+  .mc-indicators { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .indicator-pill {
+    font-size:10px; padding:3px 10px; border-radius:20px;
+    background:rgba(255,215,0,0.07); color:var(--text2); border:1px solid var(--border);
+    font-family:'Rajdhani',sans-serif;
+  }
+  .mc-details { margin-top:14px; display:none; border-top:1px solid var(--border); padding-top:14px; }
+  .mc-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; }
+  .mc-row span:first-child { color:var(--text2); }
+  .market-card.expanded .mc-details { display:block; }
 
-/* CARDS */
-.card { background:var(--black-3); border:1px solid rgba(201,168,76,0.07); border-radius:10px; padding:22px; }
-.card-title { font-size:13px; font-weight:700; color:rgba(245,240,232,0.75); letter-spacing:1px; margin-bottom:14px; }
+  /* SIGNAL STRENGTH */
+  .signal-bar { display:flex; gap:3px; align-items:center; margin-top:8px; }
+  .signal-seg { height:8px; width:18px; border-radius:2px; background:rgba(255,255,255,0.1); }
+  .signal-seg.active-green { background:var(--green); }
+  .signal-seg.active-gold { background:var(--gold); }
+  .signal-seg.active-red { background:var(--red-price); }
 
-/* GRIDS */
-.g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
-.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  /* BUTTONS */
+  .btn {
+    padding:10px 22px; border-radius:8px; font-family:'Cairo',sans-serif;
+    font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s;
+  }
+  .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:black; }
+  .btn-gold:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 4px 15px rgba(255,215,0,0.3); }
+  .btn-outline { background:transparent; border:1px solid var(--gold); color:var(--gold); }
+  .btn-outline:hover { background:rgba(255,215,0,0.1); }
+  .btn-red { background:linear-gradient(135deg,var(--red2),var(--red)); color:white; }
+  .btn-sm { padding:6px 14px; font-size:12px; }
 
-/* STAT BOX */
-.stat-box { background:var(--black-4); border-radius:9px; padding:18px; border:1px solid rgba(201,168,76,0.05); }
-.stat-val { font-family:'Orbitron',monospace; font-size:22px; font-weight:700; margin-bottom:4px; }
-.stat-lbl { font-size:10px; color:var(--gray); letter-spacing:1px; }
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { padding:12px 16px; text-align:right; color:var(--text2); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); background:var(--bg4); }
+  td { padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  tr:hover td { background:rgba(255,215,0,0.03); }
+  .status-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .status-badge.open { background:rgba(0,200,83,0.15); color:var(--green); }
+  .status-badge.closed { background:rgba(255,255,255,0.05); color:var(--text2); }
+  .status-badge.profit { background:rgba(0,200,83,0.15); color:var(--green); }
+  .status-badge.loss { background:rgba(255,61,61,0.15); color:var(--red-price); }
 
-/* MARKET */
-.market-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-.m-card { background:var(--black-3); border:1px solid rgba(201,168,76,0.07); border-radius:9px; padding:18px; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden; }
-.m-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--gold-dark),var(--gold)); opacity:0; transition:opacity 0.3s; }
-.m-card:hover { border-color:rgba(201,168,76,0.22); transform:translateY(-3px); box-shadow:0 12px 24px rgba(0,0,0,0.4); }
-.m-card:hover::before { opacity:1; }
-.coin-h { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-.coin-i { display:flex; align-items:center; gap:9px; }
-.ci { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-size:10px; font-weight:700; }
-.btc{background:rgba(247,147,26,0.15);color:#F7931A;border:1px solid rgba(247,147,26,0.3)}
-.eth{background:rgba(98,126,234,0.15);color:#627EEA;border:1px solid rgba(98,126,234,0.3)}
-.sol{background:rgba(153,69,255,0.15);color:#9945FF;border:1px solid rgba(153,69,255,0.3)}
-.bnb{background:rgba(243,186,47,0.15);color:#F3BA2F;border:1px solid rgba(243,186,47,0.3)}
-.xrp{background:rgba(0,170,228,0.15);color:#00AAE4;border:1px solid rgba(0,170,228,0.3)}
-.ada{background:rgba(0,51,173,0.15);color:#0033AD;border:1px solid rgba(0,51,173,0.3)}
-.doge{background:rgba(197,162,72,0.15);color:#C5A248;border:1px solid rgba(197,162,72,0.3)}
-.dot{background:rgba(230,0,122,0.15);color:#E6007A;border:1px solid rgba(230,0,122,0.3)}
-.avax{background:rgba(232,65,66,0.15);color:#E84142;border:1px solid rgba(232,65,66,0.3)}
-.cn { font-weight:700; font-size:14px; }
-.cp { font-size:10px; color:var(--gray); }
-.sig { padding:3px 9px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:1px; }
-.sig.buy{background:rgba(0,200,81,0.15);color:var(--green);border:1px solid rgba(0,200,81,0.3)}
-.sig.sell{background:rgba(255,59,48,0.15);color:var(--red-s);border:1px solid rgba(255,59,48,0.3)}
-.sig.wait{background:rgba(255,214,0,0.15);color:var(--yellow);border:1px solid rgba(255,214,0,0.3)}
-.m-price { font-family:'Orbitron',monospace; font-size:20px; font-weight:700; margin-bottom:3px; }
-.m-change { font-size:12px; margin-bottom:12px; }
-.mini-chart { height:40px; margin-bottom:10px; }
-.mini-chart svg { width:100%; height:100%; }
-.inds { display:flex; gap:6px; margin-bottom:10px; }
-.ind { flex:1; background:var(--black-4); border-radius:5px; padding:7px; text-align:center; }
-.ind-l { font-size:8px; color:var(--gray); letter-spacing:1px; margin-bottom:2px; }
-.ind-v { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; }
-.ee-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px; }
-.ee { background:var(--black-4); border-radius:5px; padding:8px; }
-.ee-l { font-size:8px; letter-spacing:1px; margin-bottom:3px; }
-.entry-b .ee-l { color:var(--green); }
-.sl-b .ee-l { color:var(--red-s); }
-.ee-v { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; }
-.invest-r { background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.12); border-radius:5px; padding:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.inv-l { font-size:9px; color:var(--gray); }
-.inv-v { font-family:'Orbitron',monospace; font-size:11px; color:var(--gold); font-weight:700; }
-.rate-row { display:flex; align-items:center; gap:6px; }
-.r-l { font-size:9px; color:var(--gray); }
-.r-bar { flex:1; height:2px; background:var(--black-5); border-radius:1px; overflow:hidden; }
-.r-fill { height:100%; background:linear-gradient(90deg,var(--gold-dark),var(--gold)); }
-.r-v { font-size:9px; color:var(--gold); font-weight:700; }
+  /* CHART AREA */
+  .chart-placeholder {
+    background:var(--bg4); border:1px solid var(--border); border-radius:12px;
+    height:220px; display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+  }
+  .chart-line { position:absolute; bottom:0; left:0; right:0; height:100%; }
 
-/* PORTFOLIO */
-.p-balance { font-family:'Orbitron',monospace; font-size:36px; font-weight:700; color:var(--gold); margin-bottom:4px; }
-.p-sub { font-size:12px; color:var(--gray); margin-bottom:20px; }
+  /* AI CHAT */
+  .ai-chat { display:flex; flex-direction:column; height:500px; }
+  .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .chat-msg { max-width:80%; padding:12px 16px; border-radius:12px; font-size:14px; line-height:1.6; }
+  .chat-msg.bot { background:var(--bg4); border:1px solid var(--border); align-self:flex-start; }
+  .chat-msg.user { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:black; align-self:flex-end; font-weight:600; }
+  .chat-input-row { display:flex; gap:10px; padding:16px; border-top:1px solid var(--border); }
+  .chat-input {
+    flex:1; background:var(--bg4); border:1px solid var(--border);
+    border-radius:8px; padding:10px 16px; color:var(--text); font-family:'Cairo',sans-serif;
+    font-size:14px; outline:none;
+  }
+  .chat-input:focus { border-color:var(--gold); }
 
-/* TRADE TABLE */
-.t-table { width:100%; border-collapse:collapse; }
-.t-table th { font-size:9px; letter-spacing:2px; color:var(--gold-dark); text-transform:uppercase; padding:9px 10px; text-align:right; border-bottom:1px solid rgba(201,168,76,0.1); }
-.t-table td { padding:11px 10px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; }
-.t-table tr:hover td { background:rgba(201,168,76,0.02); }
-.profit { color:var(--green); }
-.loss { color:var(--red-s); }
+  /* RISK METER */
+  .risk-selector { display:flex; gap:12px; margin-bottom:20px; }
+  .risk-option {
+    flex:1; padding:16px; border-radius:10px; cursor:pointer; text-align:center;
+    border:2px solid transparent; transition:all 0.2s;
+  }
+  .risk-option.low { background:rgba(0,200,83,0.08); }
+  .risk-option.medium { background:rgba(255,215,0,0.08); }
+  .risk-option.high { background:rgba(255,61,61,0.08); }
+  .risk-option.active.low { border-color:var(--green); }
+  .risk-option.active.medium { border-color:var(--gold); }
+  .risk-option.active.high { border-color:var(--red-price); }
+  .risk-option .risk-icon { font-size:28px; margin-bottom:6px; }
+  .risk-option .risk-name { font-weight:700; font-size:15px; }
+  .risk-option .risk-pct { font-size:12px; color:var(--text2); margin-top:2px; }
 
-/* AI CHAT */
-.chat-wrap { height:380px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
-.chat-msg { max-width:78%; padding:11px 14px; border-radius:10px; font-size:12px; line-height:1.6; }
-.chat-msg.user { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.18); align-self:flex-start; }
-.chat-msg.ai { background:var(--black-4); border:1px solid rgba(255,255,255,0.07); align-self:flex-end; }
-.ai-lbl { font-size:9px; color:var(--gold); letter-spacing:2px; margin-bottom:5px; }
-.chat-in-row { display:flex; gap:8px; padding:14px; border-top:1px solid rgba(255,255,255,0.07); }
-.chat-in { flex:1; background:var(--black-4); border:1px solid rgba(201,168,76,0.18); border-radius:7px; padding:11px 14px; color:var(--white); font-family:'Tajawal',sans-serif; font-size:13px; }
-.chat-in:focus { outline:none; border-color:var(--gold); }
-.chat-send { background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:var(--black); border:none; padding:11px 18px; border-radius:7px; font-weight:700; cursor:pointer; font-family:'Tajawal',sans-serif; font-size:13px; }
+  /* PROGRESS */
+  .progress-bar { height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
+  .progress-fill.gold { background:linear-gradient(90deg,var(--gold2),var(--gold)); }
+  .progress-fill.green { background:var(--green); }
+  .progress-fill.red { background:var(--red-price); }
 
-/* SETTINGS */
-.s-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
-.s-name { font-size:13px; font-weight:600; margin-bottom:2px; }
-.s-desc { font-size:11px; color:var(--gray); }
-.toggle { width:42px; height:22px; background:var(--black-5); border-radius:11px; position:relative; cursor:pointer; transition:background 0.3s; border:1px solid rgba(255,255,255,0.08); }
-.toggle.on { background:var(--gold-dark); }
-.toggle::after { content:''; position:absolute; top:2px; right:2px; width:16px; height:16px; border-radius:50%; background:var(--white); transition:transform 0.3s; }
-.toggle.on::after { transform:translateX(-20px); }
+  /* COURSE */
+  .course-header {
+    background: linear-gradient(135deg, #1a0a00 0%, #0d0d0d 100%);
+    border: 1px solid var(--border); border-radius:14px;
+    padding:30px; margin-bottom:24px;
+    position:relative; overflow:hidden;
+  }
+  .course-header::after {
+    content:'📈'; position:absolute; right:30px; top:50%; transform:translateY(-50%);
+    font-size:80px; opacity:0.1;
+  }
+  .course-header h2 { font-size:26px; font-weight:700; margin-bottom:8px; }
+  .course-header h2 span { color:var(--gold); }
+  .course-header p { color:var(--text2); font-size:14px; max-width:500px; }
+  .course-stats { display:flex; gap:24px; margin-top:20px; }
+  .course-stat { font-size:13px; color:var(--text2); }
+  .course-stat strong { color:var(--gold); font-size:20px; font-family:'Rajdhani',sans-serif; display:block; }
 
-/* RISK */
-.risk-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
-.risk-card { background:var(--black-3); border-radius:10px; padding:24px; text-align:center; cursor:pointer; transition:all 0.3s; border:2px solid transparent; }
-.risk-card:hover { transform:translateY(-3px); }
-.risk-card.low { border-color:rgba(0,200,81,0.2); }
-.risk-card.medium { border-color:rgba(255,214,0,0.2); }
-.risk-card.high { border-color:rgba(255,59,48,0.2); }
-.risk-card.sel.low { border-color:rgba(0,200,81,0.5); background:rgba(0,200,81,0.05); }
-.risk-card.sel.medium { border-color:rgba(255,214,0,0.5); background:rgba(255,214,0,0.05); }
-.risk-card.sel.high { border-color:rgba(255,59,48,0.5); background:rgba(255,59,48,0.05); }
-.r-emoji { font-size:40px; margin-bottom:12px; }
-.r-name { font-size:16px; font-weight:700; margin-bottom:6px; }
-.r-pct { font-family:'Orbitron',monospace; font-size:24px; font-weight:900; margin-bottom:8px; }
-.r-pct.low{color:var(--green)} .r-pct.medium{color:var(--yellow)} .r-pct.high{color:var(--red-s)}
-.r-desc { font-size:11px; color:var(--gray); line-height:1.6; }
+  .chapter-list { display:flex; flex-direction:column; gap:12px; }
+  .chapter-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden; cursor:pointer; transition:all 0.2s;
+  }
+  .chapter-card:hover { border-color:rgba(255,215,0,0.3); }
+  .chapter-header { display:flex; align-items:center; gap:16px; padding:18px 20px; }
+  .ch-num {
+    width:42px; height:42px; border-radius:10px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:black; font-size:16px; font-family:'Rajdhani',sans-serif;
+  }
+  .ch-num.locked { background:var(--bg4); color:var(--text2); }
+  .ch-info { flex:1; }
+  .ch-title { font-size:16px; font-weight:700; margin-bottom:3px; }
+  .ch-meta { font-size:12px; color:var(--text2); display:flex; gap:16px; }
+  .ch-progress { text-align:left; }
+  .ch-pct { font-size:20px; font-weight:700; font-family:'Rajdhani',sans-serif; }
+  .ch-pct.done { color:var(--green); }
+  .ch-pct.inprogress { color:var(--gold); }
+  .chapter-content { display:none; border-top:1px solid var(--border); padding:20px; background:var(--bg4); }
+  .chapter-card.open .chapter-content { display:block; }
+  .lesson-list { display:flex; flex-direction:column; gap:8px; }
+  .lesson-item {
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    background:var(--bg3); border-radius:8px; cursor:pointer;
+    transition:all 0.2s; border:1px solid transparent;
+  }
+  .lesson-item:hover { border-color:var(--border); }
+  .lesson-item.done { opacity:0.7; }
+  .lesson-icon { font-size:20px; flex-shrink:0; }
+  .lesson-title { flex:1; font-size:14px; }
+  .lesson-dur { font-size:12px; color:var(--text2); }
 
-/* MODAL */
-.modal-ov { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:700; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
-.modal-ov.active { display:flex; }
-.modal-box { background:var(--black-3); border:1px solid rgba(201,168,76,0.18); border-radius:14px; padding:30px; width:520px; max-width:95vw; max-height:90vh; overflow-y:auto; position:relative; }
-.modal-close { position:absolute; top:14px; left:14px; background:none; border:none; color:var(--gray); font-size:18px; cursor:pointer; }
+  /* LESSON MODAL */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--bg3); border:1px solid var(--border); border-radius:16px;
+    width:100%; max-width:760px; max-height:90vh; overflow-y:auto;
+  }
+  .modal-header {
+    padding:20px 24px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .modal-header h3 { font-size:20px; font-weight:700; }
+  .modal-close { background:none; border:none; color:var(--text2); font-size:24px; cursor:pointer; }
+  .modal-body { padding:24px; }
+  .lesson-content-block { margin-bottom:24px; }
+  .lesson-content-block h4 { font-size:16px; font-weight:700; margin-bottom:12px; color:var(--gold); display:flex; align-items:center; gap:8px; }
+  .lesson-content-block p { font-size:14px; line-height:1.8; color:var(--text); margin-bottom:12px; }
+  .info-box {
+    background:rgba(255,215,0,0.05); border:1px solid rgba(255,215,0,0.2);
+    border-radius:10px; padding:16px; margin:12px 0; font-size:14px; line-height:1.7;
+  }
+  .tip-box {
+    background:rgba(0,200,83,0.05); border:1px solid rgba(0,200,83,0.2);
+    border-radius:10px; padding:16px; margin:12px 0; font-size:14px; line-height:1.7;
+  }
+  .warning-box {
+    background:rgba(255,61,61,0.05); border:1px solid rgba(255,61,61,0.2);
+    border-radius:10px; padding:16px; margin:12px 0; font-size:14px; line-height:1.7;
+  }
+  .concept-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:12px 0; }
+  .concept-card { background:var(--bg4); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .concept-card h5 { color:var(--gold); font-size:14px; margin-bottom:6px; }
+  .concept-card p { font-size:13px; color:var(--text2); }
+  .quiz-question { background:var(--bg4); border:1px solid var(--border); border-radius:10px; padding:20px; margin:16px 0; }
+  .quiz-question h5 { font-size:15px; margin-bottom:14px; }
+  .quiz-option {
+    display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px;
+    background:var(--bg3); border:1px solid var(--border); border-radius:8px;
+    cursor:pointer; transition:all 0.2s; font-size:14px;
+  }
+  .quiz-option:hover { border-color:var(--gold); }
+  .quiz-option.correct { border-color:var(--green); background:rgba(0,200,83,0.08); color:var(--green); }
+  .quiz-option.wrong { border-color:var(--red-price); background:rgba(255,61,61,0.08); color:var(--red-price); }
 
-/* NOTIF */
-.notif { position:fixed; top:75px; left:16px; background:var(--black-3); border:1px solid rgba(201,168,76,0.25); border-radius:9px; padding:14px 18px; z-index:600; max-width:300px; transform:translateX(-400px); transition:transform 0.4s; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
-.notif.show { transform:translateX(0); }
-.notif-t { font-size:12px; font-weight:700; color:var(--gold); margin-bottom:3px; }
-.notif-b { font-size:11px; color:var(--gray); }
+  /* ADMIN */
+  .admin-header {
+    background:linear-gradient(135deg,rgba(139,0,0,0.3),rgba(5,5,5,0.9));
+    border:1px solid rgba(139,0,0,0.4); border-radius:14px;
+    padding:24px; margin-bottom:24px; display:flex; align-items:center; gap:16px;
+  }
+  .admin-icon { font-size:48px; }
+  .admin-header-text h2 { font-size:22px; font-weight:700; }
+  .admin-header-text p { color:var(--text2); font-size:14px; }
+  .admin-stat { text-align:center; }
+  .admin-stat-val { font-size:32px; font-weight:700; font-family:'Rajdhani',sans-serif; color:var(--gold); }
+  .admin-stat-label { font-size:12px; color:var(--text2); }
+  .settings-group { margin-bottom:24px; }
+  .settings-group h4 { font-size:15px; font-weight:700; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .setting-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .setting-label { font-size:14px; }
+  .setting-sub { font-size:12px; color:var(--text2); margin-top:2px; }
+  .toggle {
+    width:46px; height:24px; background:rgba(255,255,255,0.1); border-radius:12px;
+    cursor:pointer; position:relative; transition:background 0.3s;
+  }
+  .toggle.on { background:var(--green); }
+  .toggle::after {
+    content:''; position:absolute; top:3px; right:3px;
+    width:18px; height:18px; background:white; border-radius:50%;
+    transition:transform 0.3s;
+  }
+  .toggle.on::after { transform:translateX(-22px); }
+  .input-field {
+    background:var(--bg4); border:1px solid var(--border); border-radius:8px;
+    padding:8px 14px; color:var(--text); font-family:'Cairo',sans-serif;
+    font-size:14px; outline:none; width:220px; text-align:right;
+  }
+  .input-field:focus { border-color:var(--gold); }
 
-/* BTN */
-.btn-sec { background:transparent; color:var(--white); border:1px solid rgba(245,240,232,0.18); padding:10px 22px; border-radius:6px; font-family:'Tajawal',sans-serif; font-size:13px; cursor:pointer; transition:all 0.3s; }
-.btn-sec:hover { border-color:var(--gold); color:var(--gold); }
-.btn-pri { background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:var(--black); border:none; padding:10px 22px; border-radius:6px; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.3s; }
-.btn-pri:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(201,168,76,0.3); }
+  /* ALERTS */
+  .alert-item {
+    display:flex; align-items:center; gap:14px; padding:14px 18px;
+    background:var(--bg4); border:1px solid var(--border); border-radius:10px; margin-bottom:10px;
+  }
+  .alert-icon { font-size:24px; flex-shrink:0; }
+  .alert-text { flex:1; }
+  .alert-text strong { font-size:14px; display:block; margin-bottom:2px; }
+  .alert-text span { font-size:12px; color:var(--text2); }
+  .alert-actions { display:flex; gap:8px; }
 
-/* CALC */
-.calc-res { background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.18); border-radius:9px; padding:18px; margin-top:14px; }
-.calc-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; }
-.calc-row:last-child { border-bottom:none; }
-.calc-val { font-family:'Orbitron',monospace; font-weight:700; color:var(--gold); }
+  /* NOTIFICATION TOAST */
+  .toast {
+    position:fixed; bottom:24px; left:24px; z-index:9999;
+    background:var(--bg3); border:1px solid var(--gold); border-radius:10px;
+    padding:14px 20px; display:flex; align-items:center; gap:12px;
+    transform:translateX(-200%); transition:transform 0.4s;
+    max-width:320px; box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform:translateX(0); }
+  .toast-icon { font-size:22px; flex-shrink:0; }
+  .toast-text { font-size:14px; }
+  .toast-text strong { display:block; margin-bottom:2px; color:var(--gold); }
 
-/* FORM */
-.fg { margin-bottom:14px; }
-.fl { display:block; font-size:10px; letter-spacing:2px; color:var(--gold); margin-bottom:6px; }
-.fi { width:100%; background:var(--black-4); border:1px solid rgba(201,168,76,0.18); border-radius:5px; padding:11px 13px; color:var(--white); font-family:'Tajawal',sans-serif; font-size:13px; }
-.fi:focus { outline:none; border-color:var(--gold); }
-.fs { width:100%; background:var(--black-4); border:1px solid rgba(201,168,76,0.18); border-radius:5px; padding:11px 13px; color:var(--white); font-family:'Tajawal',sans-serif; font-size:13px; }
+  /* PORTFOLIO CHART SVG */
+  .portfolio-chart { width:100%; height:160px; }
 
-/* PROGRESS */
-.prog-bar { height:5px; background:var(--black-5); border-radius:3px; overflow:hidden; margin-top:6px; }
-.prog-fill { height:100%; background:linear-gradient(90deg,var(--gold-dark),var(--gold)); border-radius:3px; transition:width 1s ease; }
+  /* ACHIEVEMENT BADGES */
+  .badges-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .badge-item { text-align:center; padding:16px 8px; background:var(--bg4); border-radius:10px; border:1px solid var(--border); }
+  .badge-item .badge-icon { font-size:32px; margin-bottom:6px; }
+  .badge-item .badge-name { font-size:11px; color:var(--text2); }
+  .badge-item.earned { border-color:rgba(255,215,0,0.4); background:rgba(255,215,0,0.05); }
+  .badge-item.earned .badge-name { color:var(--gold); }
 
-/* ALERTS */
-.alert-item { display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--black-4); border-radius:7px; margin-bottom:7px; }
-.a-del { background:rgba(255,59,48,0.12); color:var(--red-s); border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:11px; }
+  /* LOADING */
+  .loading { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,215,0,0.3); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
 
-/* PLAN ROWS */
-.plan-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; }
-.plan-row:last-child { border-bottom:none; }
-.plan-l { color:var(--gray); }
-.plan-v { font-family:'Orbitron',monospace; font-weight:700; }
+  /* AUTH PAGES */
+  .auth-wrap {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(139,0,0,0.3) 0%, var(--bg) 60%);
+    padding:20px;
+  }
+  .auth-box {
+    background:var(--bg3); border:1px solid var(--border); border-radius:16px;
+    padding:40px; width:100%; max-width:440px;
+  }
+  .auth-logo { text-align:center; margin-bottom:32px; }
+  .auth-logo .logo-text { font-family:'Rajdhani',sans-serif; font-size:36px; font-weight:700; background:linear-gradient(135deg,var(--gold),var(--gold2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:3px; }
+  .auth-logo p { color:var(--text2); font-size:13px; margin-top:4px; }
+  .auth-tabs { display:flex; background:var(--bg4); border-radius:10px; padding:4px; margin-bottom:24px; }
+  .auth-tab { flex:1; padding:10px; text-align:center; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; color:var(--text2); }
+  .auth-tab.active { background:var(--bg3); color:var(--gold); box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+  .form-group { margin-bottom:16px; }
+  .form-label { font-size:13px; color:var(--text2); margin-bottom:6px; display:block; }
+  .form-input {
+    width:100%; background:var(--bg4); border:1px solid var(--border); border-radius:8px;
+    padding:12px 16px; color:var(--text); font-family:'Cairo',sans-serif;
+    font-size:14px; outline:none; transition:border-color 0.2s; text-align:right;
+  }
+  .form-input:focus { border-color:var(--gold); }
 
-/* RESPONSIVE */
-@media(max-width:1024px) { .sidebar{display:none} .main{margin-right:0} .market-grid{grid-template-columns:1fr 1fr} .g4{grid-template-columns:1fr 1fr} }
-@media(max-width:768px) { nav{padding:0 14px} .market-grid{grid-template-columns:1fr} .g2,.g3{grid-template-columns:1fr} .risk-grid{grid-template-columns:1fr} .page{padding:14px} }
+  /* BACKTEST */
+  .backtest-result {
+    background:var(--bg4); border:1px solid var(--border); border-radius:12px;
+    padding:20px; margin-top:16px; display:none;
+  }
+  .backtest-result.show { display:block; }
+  .bt-stat { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:14px; }
+  .bt-stat:last-child { border:none; }
+  .bt-stat span:last-child { font-weight:700; font-family:'Rajdhani',sans-serif; }
+  .bt-stat .pos { color:var(--green); }
+  .bt-stat .neg { color:var(--red-price); }
+
+  /* SCROLLABLE SECTION */
+  .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .section-header h3 { font-size:18px; font-weight:700; }
+  .see-all { font-size:13px; color:var(--gold); cursor:pointer; }
+  .see-all:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo">EAM.TRADING</div>
-  <div class="loading-spinner"></div>
-  <div style="font-size:12px;color:var(--gray);letter-spacing:2px">جاري التحميل...</div>
-</div>
-
-<!-- AUTH -->
-<div class="auth-screen hidden" id="authScreen">
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="auth-wrap">
   <div class="auth-box">
-    <div class="auth-logo">EAM.TRADING</div>
-    <div class="auth-sub">منصة التداول الذكي — سجّل دخولك للبدء</div>
-    
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchTab('login')">تسجيل الدخول</div>
-      <div class="auth-tab" onclick="switchTab('signup')">حساب جديد</div>
+    <div class="auth-logo">
+      <div class="logo-text">EAM TRADING</div>
+      <p>منصة التداول الذكي المتكاملة</p>
     </div>
-    
-    <div id="authError" class="auth-error"></div>
-    <div id="authSuccess" class="auth-success"></div>
-    
-    <!-- LOGIN -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">حساب جديد</div>
+    </div>
     <div id="loginForm">
       <div class="form-group">
-        <label class="form-label">الإيميل</label>
+        <label class="form-label">البريد الإلكتروني</label>
         <input type="email" class="form-input" id="loginEmail" placeholder="example@email.com">
       </div>
       <div class="form-group">
-        <label class="form-label">كلمة السر</label>
-        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-input" id="loginPass" placeholder="••••••••">
       </div>
-      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">تسجيل الدخول</button>
-      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--gray)">
-        <span style="color:var(--gold);cursor:pointer" onclick="handleForgotPassword()">نسيت كلمة السر؟</span>
-      </div>
+      <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="doLogin()">دخول</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">
+        للتجربة: admin@eam.com / admin123 أو user@eam.com / user123
+      </p>
     </div>
-    
-    <!-- SIGNUP -->
-    <div id="signupForm" style="display:none">
+    <div id="registerForm" style="display:none">
       <div class="form-group">
-        <label class="form-label">الاسم</label>
-        <input type="text" class="form-input" id="signupName" placeholder="اسمك الكامل">
+        <label class="form-label">الاسم الكامل</label>
+        <input type="text" class="form-input" id="regName" placeholder="محمد أحمد">
       </div>
       <div class="form-group">
-        <label class="form-label">الإيميل</label>
-        <input type="email" class="form-input" id="signupEmail" placeholder="example@email.com">
+        <label class="form-label">البريد الإلكتروني</label>
+        <input type="email" class="form-input" id="regEmail" placeholder="example@email.com">
       </div>
       <div class="form-group">
-        <label class="form-label">كلمة السر</label>
-        <input type="password" class="form-input" id="signupPassword" placeholder="8 أحرف على الأقل">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-input" id="regPass" placeholder="8 أحرف على الأقل">
       </div>
-      <button class="btn-primary" id="signupBtn" onclick="handleSignup()">إنشاء حساب مجاني</button>
-    </div>
-    
-    <div style="margin-top:20px;text-align:center;font-size:11px;color:rgba(136,136,136,0.6)">
-      ⚠️ هذه المنصة للتحليل فقط وليست نصيحة مالية
+      <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="doRegister()">إنشاء حساب</button>
     </div>
   </div>
 </div>
 
-<!-- NOTIF -->
-<div class="notif" id="notif">
-  <div class="notif-t" id="notifT">تنبيه</div>
-  <div class="notif-b" id="notifB">...</div>
+<!-- MAIN APP -->
+<div id="appScreen" style="display:none">
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-inner" id="tickerInner">
+    <div class="ticker-item"><span class="coin-name">BTC/USD</span><span class="price" id="t-btc">جاري التحميل...</span><span class="change up" id="tc-btc">--</span></div>
+    <div class="ticker-item"><span class="coin-name">ETH/USD</span><span class="price" id="t-eth">--</span><span class="change up" id="tc-eth">--</span></div>
+    <div class="ticker-item"><span class="coin-name">BNB/USD</span><span class="price" id="t-bnb">--</span><span class="change" id="tc-bnb">--</span></div>
+    <div class="ticker-item"><span class="coin-name">SOL/USD</span><span class="price" id="t-sol">--</span><span class="change up" id="tc-sol">--</span></div>
+    <div class="ticker-item"><span class="coin-name">XRP/USD</span><span class="price" id="t-xrp">--</span><span class="change" id="tc-xrp">--</span></div>
+    <div class="ticker-item"><span class="coin-name">AVAX/USD</span><span class="price" id="t-avax">--</span><span class="change" id="tc-avax">--</span></div>
+    <div class="ticker-item"><span class="coin-name">DOGE/USD</span><span class="price" id="t-doge">--</span><span class="change" id="tc-doge">--</span></div>
+    <div class="ticker-item"><span class="coin-name">ADA/USD</span><span class="price" id="t-ada">--</span><span class="change" id="tc-ada">--</span></div>
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item"><span class="coin-name">BTC/USD</span><span class="price" id="t-btc2">--</span><span class="change up">--</span></div>
+    <div class="ticker-item"><span class="coin-name">ETH/USD</span><span class="price" id="t-eth2">--</span><span class="change up">--</span></div>
+    <div class="ticker-item"><span class="coin-name">BNB/USD</span><span class="price" id="t-bnb2">--</span><span class="change">--</span></div>
+    <div class="ticker-item"><span class="coin-name">SOL/USD</span><span class="price" id="t-sol2">--</span><span class="change up">--</span></div>
+    <div class="ticker-item"><span class="coin-name">XRP/USD</span><span class="price" id="t-xrp2">--</span><span class="change">--</span></div>
+    <div class="ticker-item"><span class="coin-name">AVAX/USD</span><span class="price" id="t-avax2">--</span><span class="change">--</span></div>
+    <div class="ticker-item"><span class="coin-name">DOGE/USD</span><span class="price" id="t-doge2">--</span><span class="change">--</span></div>
+    <div class="ticker-item"><span class="coin-name">ADA/USD</span><span class="price" id="t-ada2">--</span><span class="change">--</span></div>
+  </div>
 </div>
 
-<!-- APP -->
-<div class="app" id="app">
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">EAM TRADING</div>
+    <div class="logo-sub">SMART PLATFORM</div>
+  </div>
+  <div class="user-info">
+    <div class="user-avatar" id="userAvatarNav">U</div>
+    <div>
+      <div class="user-name" id="userNameNav">مستخدم</div>
+      <div class="user-level" id="userLevelNav">⭐ متداول مبتدئ</div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">🏠</span> لوحة التحكم</div>
+    <div class="nav-item" onclick="showPage('market')"><span class="icon">📊</span> السوق المباشر</div>
+    <div class="nav-item" onclick="showPage('signals')"><span class="icon">🎯</span> التوصيات <span class="nav-badge">3</span></div>
+    <div class="nav-section">التداول</div>
+    <div class="nav-item" onclick="showPage('portfolio')"><span class="icon">💼</span> محفظتي</div>
+    <div class="nav-item" onclick="showPage('trades')"><span class="icon">📋</span> سجل الصفقات</div>
+    <div class="nav-item" onclick="showPage('risk')"><span class="icon">⚖️</span> إدارة المخاطر</div>
+    <div class="nav-item" onclick="showPage('calc')"><span class="icon">🧮</span> حاسبة الصفقة</div>
+    <div class="nav-item" onclick="showPage('backtest')"><span class="icon">🔄</span> باك تيستينج</div>
+    <div class="nav-section">الذكاء الاصطناعي</div>
+    <div class="nav-item" onclick="showPage('ai')"><span class="icon">🤖</span> مستشار AI</div>
+    <div class="nav-item" onclick="showPage('news')"><span class="icon">📰</span> الأخبار والتحليل</div>
+    <div class="nav-item" onclick="showPage('calendar')"><span class="icon">📅</span> التقويم الاقتصادي</div>
+    <div class="nav-section">التطوير</div>
+    <div class="nav-item" onclick="showPage('course')"><span class="icon">🎓</span> كورس التداول</div>
+    <div class="nav-item" onclick="showPage('alerts')"><span class="icon">🔔</span> التنبيهات</div>
+    <div class="nav-item" onclick="showPage('achievements')"><span class="icon">🏆</span> الإنجازات</div>
+    <div class="nav-item" onclick="showPage('reports')"><span class="icon">📈</span> التقارير</div>
+    <div class="nav-item" id="adminNavItem" onclick="showPage('admin')" style="display:none"><span class="icon">👑</span> لوحة الإدارة</div>
+    <div class="nav-section">الحساب</div>
+    <div class="nav-item" onclick="showPage('settings')"><span class="icon">⚙️</span> الإعدادات</div>
+    <div class="nav-item" onclick="doLogout()"><span class="icon">🚪</span> خروج</div>
+  </div>
+</nav>
 
-  <!-- NAV -->
-  <nav>
-    <div class="logo">EAM<span style="-webkit-text-fill-color:var(--red-light)">.</span>TRADING</div>
-    <div class="nav-right">
-      <span style="font-size:12px;color:var(--gray)"><div class="live-dot"></div> مباشر</span>
-      <div class="user-info">
-        <div class="user-avatar" id="userAvatar">U</div>
-        <div class="user-email" id="userEmailDisplay">...</div>
-      </div>
-      <button class="btn-logout" onclick="handleLogout()">خروج</button>
-    </div>
-  </nav>
+<!-- MAIN -->
+<div class="main">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="s-section">
-      <div class="s-title">الرئيسية</div>
-      <div class="s-item active" onclick="go('market')"><span class="s-icon">📊</span> السوق المباشر</div>
-      <div class="s-item" onclick="go('portfolio')"><span class="s-icon">💼</span> محفظتي</div>
-      <div class="s-item" onclick="go('trades')"><span class="s-icon">📋</span> سجل الصفقات</div>
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h1>مرحباً، <span id="welcomeName">مستخدم</span> 👋</h1>
+    <p id="dashDate">يوم موفق في السوق</p>
+  </div>
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">💰 رأس المال</div>
+      <div class="card-value" id="capitalVal">$10,000</div>
+      <div class="card-change up" id="capitalChange">+$240 هذا الشهر</div>
     </div>
-    <div class="s-section">
-      <div class="s-title">التحليل</div>
-      <div class="s-item" onclick="go('ai')"><span class="s-icon">🤖</span> مستشار AI</div>
-      <div class="s-item" onclick="go('news')"><span class="s-icon">📰</span> الأخبار</div>
-      <div class="s-item" onclick="go('calendar')"><span class="s-icon">📅</span> التقويم</div>
-      <div class="s-item" onclick="go('backtesting')"><span class="s-icon">🔄</span> باك تيستينج</div>
+    <div class="card">
+      <div class="card-title">📊 الصفقات المفتوحة</div>
+      <div class="card-value" id="openTrades">3</div>
+      <div class="card-change up">2 رابحة، 1 خاسرة</div>
     </div>
-    <div class="s-section">
-      <div class="s-title">الإدارة</div>
-      <div class="s-item" onclick="go('risk')"><span class="s-icon">⚖️</span> إدارة المخاطر</div>
-      <div class="s-item" onclick="go('calculator')"><span class="s-icon">🧮</span> حاسبة الصفقة</div>
-      <div class="s-item" onclick="go('alerts')"><span class="s-icon">🔔</span> التنبيهات</div>
-      <div class="s-item" onclick="go('reports')"><span class="s-icon">📈</span> التقارير</div>
+    <div class="card">
+      <div class="card-title">✅ نسبة النجاح</div>
+      <div class="card-value" style="color:var(--green)">68%</div>
+      <div class="card-change up">+5% هذا الأسبوع</div>
     </div>
-    <div class="s-section">
-      <div class="s-title">الحساب</div>
-      <div class="s-item" onclick="go('points')"><span class="s-icon">🏆</span> نقاطي</div>
-      <div class="s-item" onclick="go('referral')"><span class="s-icon">🔗</span> الإحالة</div>
-      <div class="s-item" onclick="go('settings')"><span class="s-icon">⚙️</span> الإعدادات</div>
+    <div class="card">
+      <div class="card-title">🏆 النقاط المكتسبة</div>
+      <div class="card-value" style="color:var(--gold)" id="userPoints">1,240</div>
+      <div class="card-change up">+80 اليوم</div>
     </div>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
-
-    <!-- MARKET -->
-    <div class="page active" id="page-market">
-      <div class="page-title">السوق <span class="gold">المباشر</span></div>
-      <div class="page-sub">بيانات محدّثة كل 15 ثانية — اضغط على أي عملة للتفاصيل</div>
-      <div class="g4" style="margin-bottom:16px" id="summaryStats"></div>
-      <div class="market-grid" id="marketGrid"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="section-header">
+        <h3>📈 أداء المحفظة</h3>
+        <span class="see-all" onclick="showPage('portfolio')">عرض الكل</span>
+      </div>
+      <div class="chart-placeholder" style="height:160px">
+        <svg class="portfolio-chart" viewBox="0 0 400 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFD700" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,110 C30,100 60,90 90,85 C120,80 150,95 180,75 C210,55 240,40 270,35 C300,30 330,45 360,30 L400,20 L400,140 L0,140Z" fill="url(#chartGrad)"/>
+          <path d="M0,110 C30,100 60,90 90,85 C120,80 150,95 180,75 C210,55 240,40 270,35 C300,30 330,45 360,30 L400,20" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+          <circle cx="400" cy="20" r="5" fill="#FFD700"/>
+        </svg>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text2)">
+        <span>يناير</span><span>فبراير</span><span>مارس</span><span>أبريل</span>
+      </div>
     </div>
-
-    <!-- PORTFOLIO -->
-    <div class="page" id="page-portfolio">
-      <div class="page-title">محفظتي <span class="gold">الشخصية</span></div>
-      <div class="page-sub">تتبع رأس مالك وأداء صفقاتك</div>
-      <div class="g2" style="margin-bottom:16px">
-        <div class="card">
-          <div class="card-title">رأس المال</div>
-          <div class="p-balance" id="balanceDisplay">$0</div>
-          <div class="p-sub" id="balanceSub">أدخل رأس مالك من الإعدادات</div>
-          <div class="g2" style="gap:10px;margin-bottom:16px">
-            <div class="stat-box"><div class="stat-val" style="color:var(--green)" id="pWins">0</div><div class="stat-lbl">رابحة</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:var(--red-s)" id="pLoss">0</div><div class="stat-lbl">خاسرة</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:var(--gold)" id="pRate">0%</div><div class="stat-lbl">نسبة النجاح</div></div>
-            <div class="stat-box"><div class="stat-val" id="pTotal">0</div><div class="stat-lbl">إجمالي</div></div>
+    <div class="card">
+      <div class="section-header">
+        <h3>🎯 آخر التوصيات</h3>
+        <span class="see-all" onclick="showPage('signals')">عرض الكل</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="dashSignals">
+        <div class="alert-item" style="background:rgba(0,200,83,0.05);border-color:rgba(0,200,83,0.2)">
+          <span class="alert-icon">🟢</span>
+          <div class="alert-text">
+            <strong>BTC/USD — شراء</strong>
+            <span>دخول: $67,200 | هدف: $71,500 | وقف: $65,800</span>
           </div>
-          <button class="btn-pri" onclick="go('settings')">تحديث رأس المال</button>
+          <span class="status-badge open">جديد</span>
         </div>
-        <div class="card">
-          <div class="card-title">أداء المحفظة</div>
-          <canvas id="portfolioChart" height="200"></canvas>
+        <div class="alert-item" style="background:rgba(255,61,61,0.05);border-color:rgba(255,61,61,0.2)">
+          <span class="alert-icon">🔴</span>
+          <div class="alert-text">
+            <strong>ETH/USD — بيع</strong>
+            <span>دخول: $3,480 | هدف: $3,200 | وقف: $3,550</span>
+          </div>
+          <span class="status-badge open">جديد</span>
+        </div>
+        <div class="alert-item">
+          <span class="alert-icon">🟡</span>
+          <div class="alert-text">
+            <strong>SOL/USD — انتظار</strong>
+            <span>السوق غير واضح، انتظر تأكيداً أقوى</span>
+          </div>
+          <span class="status-badge closed">مكتمل</span>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- TRADES -->
-    <div class="page" id="page-trades">
-      <div class="page-title">سجل <span class="gold">الصفقات</span></div>
-      <div class="page-sub">كل صفقاتك المسجلة</div>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <div class="card-title" style="margin:0">الصفقات</div>
-          <button class="btn-pri" onclick="addTrade()">+ أضف صفقة</button>
-        </div>
-        <table class="t-table"><thead><tr>
-          <th>العملة</th><th>نوع</th><th>سعر الدخول</th><th>المبلغ</th><th>الربح/الخسارة</th><th>التاريخ</th>
-        </tr></thead><tbody id="tradesBody"></tbody></table>
+  <div class="card">
+    <div class="section-header">
+      <h3>🌍 نظرة سريعة على السوق</h3>
+      <span style="font-size:12px;color:var(--text2)">يتحدث كل 30 ثانية <span class="loading" id="marketLoader"></span></span>
+    </div>
+    <div class="market-grid" id="quickMarket">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- MARKET PAGE -->
+<div class="page" id="page-market">
+  <div class="page-header">
+    <h1>السوق <span>المباشر</span></h1>
+    <p>أسعار وتحليلات لحظية مدعومة من CoinGecko</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="filterMarket('all')">الكل</button>
+      <button class="btn btn-outline btn-sm" onclick="filterMarket('buy')">🟢 شراء</button>
+      <button class="btn btn-outline btn-sm" onclick="filterMarket('sell')">🔴 بيع</button>
+      <button class="btn btn-outline btn-sm" onclick="filterMarket('wait')">🟡 انتظار</button>
+      <div style="margin-right:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
+        آخر تحديث: <span id="lastUpdate">--</span> <span class="loading" id="priceLoader"></span>
       </div>
     </div>
+  </div>
+  <div class="market-grid" id="fullMarket"></div>
+</div>
 
-    <!-- AI -->
-    <div class="page" id="page-ai">
-      <div class="page-title">مستشار <span class="gold">AI</span></div>
-      <div class="page-sub">اسألني أي سؤال عن التداول</div>
-      <div class="g2">
-        <div class="card" style="padding:0;overflow:hidden">
-          <div class="chat-wrap" id="chatWrap">
-            <div class="chat-msg ai"><div class="ai-lbl">🤖 EAM AI</div>أهلاً! أنا مستشارك الذكي. اسألني عن أي عملة أو استراتيجية تداول!</div>
-          </div>
-          <div class="chat-in-row">
-            <input class="chat-in" id="chatIn" placeholder="اكتب سؤالك..." onkeypress="if(event.key==='Enter')sendChat()">
-            <button class="chat-send" onclick="sendChat()">إرسال</button>
-          </div>
+<!-- SIGNALS PAGE -->
+<div class="page" id="page-signals">
+  <div class="page-header">
+    <h1>التوصيات <span>اليومية</span></h1>
+    <p>أفضل الفرص المختارة بالذكاء الاصطناعي</p>
+  </div>
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card" style="text-align:center;border-color:rgba(0,200,83,0.3)">
+      <div style="font-size:36px;margin-bottom:8px">🎯</div>
+      <div class="card-value" style="color:var(--green)">68%</div>
+      <div class="card-title" style="justify-content:center">دقة التوصيات</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">📊</div>
+      <div class="card-value">47</div>
+      <div class="card-title" style="justify-content:center">إجمالي التوصيات</div>
+    </div>
+    <div class="card" style="text-align:center;border-color:rgba(255,215,0,0.3)">
+      <div style="font-size:36px;margin-bottom:8px">💰</div>
+      <div class="card-value" style="color:var(--gold)">+$1,840</div>
+      <div class="card-title" style="justify-content:center">إجمالي الأرباح</div>
+    </div>
+  </div>
+  <div id="signalsList">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- PORTFOLIO -->
+<div class="page" id="page-portfolio">
+  <div class="page-header">
+    <h1>محفظتي <span>الشخصية</span></h1>
+    <p>تتبع كامل لرأس المال والأداء</p>
+  </div>
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">💰 رأس المال الكلي</div>
+      <div class="card-value">$10,000</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 الأرباح الكلية</div>
+      <div class="card-value" style="color:var(--green)">+$1,240</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📉 الخسائر الكلية</div>
+      <div class="card-value" style="color:var(--red-price)">-$380</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏦 صافي الربح</div>
+      <div class="card-value" style="color:var(--green)">+$860</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="margin-bottom:16px">توزيع المحفظة</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Bitcoin (BTC)</span><span>45%</span></div>
+          <div class="progress-bar"><div class="progress-fill gold" style="width:45%"></div></div>
         </div>
         <div>
-          <div class="card" style="margin-bottom:14px">
-            <div class="card-title">أسئلة سريعة</div>
-            <div style="display:flex;flex-direction:column;gap:7px">
-              <button class="btn-sec" style="text-align:right;padding:9px 12px;font-size:12px" onclick="ask('شو رأيك بـ BTC هلق؟')">شو رأيك بـ BTC هلق؟</button>
-              <button class="btn-sec" style="text-align:right;padding:9px 12px;font-size:12px" onclick="ask('كيف أقرأ مؤشر RSI؟')">كيف أقرأ مؤشر RSI؟</button>
-              <button class="btn-sec" style="text-align:right;padding:9px 12px;font-size:12px" onclick="ask('شو هو Stop Loss؟')">شو هو Stop Loss؟</button>
-              <button class="btn-sec" style="text-align:right;padding:9px 12px;font-size:12px" onclick="ask('أفضل استراتيجية للمبتدئين؟')">أفضل استراتيجية للمبتدئين؟</button>
-            </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Ethereum (ETH)</span><span>28%</span></div>
+          <div class="progress-bar"><div class="progress-fill green" style="width:28%"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Solana (SOL)</span><span>15%</span></div>
+          <div class="progress-bar"><div class="progress-fill gold" style="width:15%"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>أخرى</span><span>12%</span></div>
+          <div class="progress-bar"><div class="progress-fill red" style="width:12%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:16px">الأداء الشهري</h3>
+      <svg viewBox="0 0 300 160" style="width:100%">
+        <defs>
+          <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00c853" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#00c853" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,120 L50,100 L100,110 L150,70 L200,50 L250,60 L300,30 L300,160 L0,160Z" fill="url(#g2)"/>
+        <path d="M0,120 L50,100 L100,110 L150,70 L200,50 L250,60 L300,30" fill="none" stroke="#00c853" stroke-width="2"/>
+        <text x="0" y="155" fill="#666" font-size="10">يناير</text>
+        <text x="100" y="155" fill="#666" font-size="10">فبراير</text>
+        <text x="200" y="155" fill="#666" font-size="10">مارس</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:16px">إضافة / تعديل رأس المال</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <input type="number" class="input-field" id="capitalInput" placeholder="أدخل رأس المال" style="width:200px">
+      <select class="input-field" style="width:150px">
+        <option>دولار أمريكي</option>
+        <option>يورو</option>
+        <option>شيكل</option>
+      </select>
+      <button class="btn btn-gold" onclick="updateCapital()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADES -->
+<div class="page" id="page-trades">
+  <div class="page-header">
+    <h1>سجل <span>الصفقات</span></h1>
+    <p>جميع صفقاتك المفتوحة والمغلقة</p>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-outline btn-sm" onclick="filterTrades('all')">الكل</button>
+      <button class="btn btn-outline btn-sm" onclick="filterTrades('open')">مفتوحة</button>
+      <button class="btn btn-outline btn-sm" onclick="filterTrades('closed')">مغلقة</button>
+      <div style="margin-right:auto">
+        <button class="btn btn-gold btn-sm" onclick="showAddTrade()">+ إضافة صفقة</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table id="tradesTable">
+        <thead>
+          <tr>
+            <th>العملة</th><th>النوع</th><th>سعر الدخول</th><th>سعر الهدف</th><th>وقف الخسارة</th><th>الحجم</th><th>الربح/خسارة</th><th>الحالة</th><th>التاريخ</th>
+          </tr>
+        </thead>
+        <tbody id="tradesBody">
+          <tr><td>BTC/USD</td><td><span style="color:var(--green)">شراء</span></td><td>$67,200</td><td>$71,500</td><td>$65,800</td><td>$500</td><td class="card-change up">+$180</td><td><span class="status-badge open">مفتوحة</span></td><td>2026/03/20</td></tr>
+          <tr><td>ETH/USD</td><td><span style="color:var(--red-price)">بيع</span></td><td>$3,480</td><td>$3,200</td><td>$3,550</td><td>$300</td><td class="card-change down">-$45</td><td><span class="status-badge open">مفتوحة</span></td><td>2026/03/21</td></tr>
+          <tr><td>SOL/USD</td><td><span style="color:var(--green)">شراء</span></td><td>$155</td><td>$175</td><td>$148</td><td>$200</td><td class="card-change up">+$260</td><td><span class="status-badge closed">مغلقة</span></td><td>2026/03/15</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- RISK PAGE -->
+<div class="page" id="page-risk">
+  <div class="page-header">
+    <h1>إدارة <span>المخاطر</span></h1>
+    <p>تحكم كامل في مستوى المخاطرة والحماية</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <h3 style="margin-bottom:16px">اختر مستوى المخاطرة</h3>
+    <div class="risk-selector">
+      <div class="risk-option low active" onclick="selectRisk(this,'low')">
+        <div class="risk-icon">🟢</div>
+        <div class="risk-name">واطي</div>
+        <div class="risk-pct">1% - 3% لكل صفقة</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:6px">للمبتدئين</div>
+      </div>
+      <div class="risk-option medium" onclick="selectRisk(this,'medium')">
+        <div class="risk-icon">🟡</div>
+        <div class="risk-name">متوسط</div>
+        <div class="risk-pct">3% - 7% لكل صفقة</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:6px">للمتداولين</div>
+      </div>
+      <div class="risk-option high" onclick="selectRisk(this,'high')">
+        <div class="risk-icon">🔴</div>
+        <div class="risk-name">عالي</div>
+        <div class="risk-pct">7% - 15% لكل صفقة</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:6px">للمحترفين فقط</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="margin-bottom:16px">حاسبة المخاطرة</h3>
+      <div class="form-group">
+        <label class="form-label">رأس المال ($)</label>
+        <input type="number" class="form-input" id="riskCapital" value="10000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">نسبة المخاطرة (%)</label>
+        <input type="number" class="form-input" id="riskPct" value="2">
+      </div>
+      <button class="btn btn-gold" style="width:100%" onclick="calcRisk()">احسب</button>
+      <div id="riskResult" style="margin-top:16px;display:none">
+        <div class="info-box">
+          <strong style="color:var(--gold)">النتيجة:</strong><br>
+          أقصى خسارة مسموح بها: <strong id="maxLoss" style="color:var(--red-price)">$200</strong><br>
+          استثمر من: <strong id="investFrom" style="color:var(--gold)">$1,000</strong> إلى <strong id="investTo" style="color:var(--gold)">$3,000</strong>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:16px">قواعد إدارة المخاطر</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+        <div class="tip-box">✅ لا تخاطر بأكثر من 2-3% من رأس المال في صفقة واحدة</div>
+        <div class="tip-box">✅ ضع دائماً Stop Loss قبل الدخول</div>
+        <div class="warning-box">⚠️ إذا خسرت 10% من رأس المال — توقف وراجع استراتيجيتك</div>
+        <div class="warning-box">⚠️ لا تتداول برأس مال تحتاجه في حياتك اليومية</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="page" id="page-calc">
+  <div class="page-header">
+    <h1>حاسبة <span>الصفقة</span></h1>
+    <p>احسب Stop Loss و Take Profit و R/R بدقة</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="margin-bottom:20px">مدخلات الصفقة</h3>
+      <div class="form-group"><label class="form-label">سعر الدخول ($)</label><input type="number" class="form-input" id="c_entry" placeholder="67000"></div>
+      <div class="form-group"><label class="form-label">سعر الهدف (Take Profit) ($)</label><input type="number" class="form-input" id="c_tp" placeholder="71000"></div>
+      <div class="form-group"><label class="form-label">وقف الخسارة (Stop Loss) ($)</label><input type="number" class="form-input" id="c_sl" placeholder="65000"></div>
+      <div class="form-group"><label class="form-label">رأس المال ($)</label><input type="number" class="form-input" id="c_capital" value="10000"></div>
+      <div class="form-group"><label class="form-label">نسبة المخاطرة (%)</label><input type="number" class="form-input" id="c_risk" value="2"></div>
+      <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="calcTrade()">احسب الصفقة</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:20px">نتيجة الحساب</h3>
+      <div id="calcResult">
+        <div style="text-align:center;color:var(--text2);padding:40px">أدخل البيانات واضغط احسب</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACKTEST -->
+<div class="page" id="page-backtest">
+  <div class="page-header">
+    <h1>باك <span>تيستينج</span></h1>
+    <p>اختبر استراتيجيتك على بيانات تاريخية</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <h3 style="margin-bottom:16px">إعدادات الاختبار</h3>
+    <div class="grid-2">
+      <div>
+        <div class="form-group"><label class="form-label">العملة</label>
+          <select class="form-input" id="bt_coin"><option>BTC/USD</option><option>ETH/USD</option><option>SOL/USD</option><option>BNB/USD</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">الفترة الزمنية</label>
+          <select class="form-input" id="bt_period"><option>3 أشهر</option><option>6 أشهر</option><option>سنة</option></select>
+        </div>
+      </div>
+      <div>
+        <div class="form-group"><label class="form-label">الاستراتيجية</label>
+          <select class="form-input" id="bt_strategy"><option>RSI Oversold</option><option>MACD Crossover</option><option>Moving Average</option><option>Bollinger Bands</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">رأس المال الافتراضي ($)</label>
+          <input type="number" class="form-input" id="bt_capital" value="10000">
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="runBacktest()">▶ تشغيل الاختبار</button>
+  </div>
+  <div class="backtest-result" id="btResult">
+    <h3 style="margin-bottom:16px;color:var(--gold)">نتائج الباك تيست</h3>
+    <div class="bt-stat"><span>إجمالي الصفقات</span><span id="bt_trades">--</span></div>
+    <div class="bt-stat"><span>الصفقات الرابحة</span><span id="bt_wins" class="pos">--</span></div>
+    <div class="bt-stat"><span>الصفقات الخاسرة</span><span id="bt_losses" class="neg">--</span></div>
+    <div class="bt-stat"><span>نسبة النجاح</span><span id="bt_winrate" class="pos">--</span></div>
+    <div class="bt-stat"><span>إجمالي الربح</span><span id="bt_profit" class="pos">--</span></div>
+    <div class="bt-stat"><span>أكبر خسارة متتالية</span><span id="bt_drawdown" class="neg">--</span></div>
+    <div class="bt-stat"><span>نسبة الربح على رأس المال</span><span id="bt_roi" class="pos">--</span></div>
+  </div>
+</div>
+
+<!-- AI PAGE -->
+<div class="page" id="page-ai">
+  <div class="page-header">
+    <h1>مستشار <span>AI</span></h1>
+    <p>مستشارك المالي الذكي — متاح 24/7</p>
+  </div>
+  <div class="card ai-chat">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg bot">مرحباً! 👋 أنا مستشار التداول الذكي الخاص بك.<br><br>يمكنني مساعدتك في:<br>📊 تحليل العملات والأسواق<br>💡 شرح مؤشرات التحليل الفني<br>⚖️ حساب نسب المخاطرة<br>📚 الإجابة على أسئلتك<br><br>اسألني أي شيء! 🚀</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="اسأل مستشارك..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-gold" onclick="sendChat()">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="page" id="page-news">
+  <div class="page-header">
+    <h1>الأخبار <span>والتحليل</span></h1>
+    <p>أهم الأخبار مع تحليل التأثير على السوق</p>
+  </div>
+  <div id="newsList">
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:16px">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px">📅 22 مارس 2026 | اقتصاد</div>
+          <h3 style="font-size:16px;margin-bottom:8px">الفيدرالي يُبقي على أسعار الفائدة دون تغيير للشهر الثالث</h3>
+          <p style="font-size:14px;color:var(--text2);line-height:1.6">أعلن الاحتياطي الفيدرالي الأمريكي إبقاءه على أسعار الفائدة عند مستوياتها الحالية في اجتماعه الأخير، مشيراً إلى استمرار مراقبة التضخم.</p>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+            <span class="status-badge profit">تأثير إيجابي للكريبتو</span>
+            <span style="font-size:12px;color:var(--green)">📈 BTC +2.3%</span>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- NEWS -->
-    <div class="page" id="page-news">
-      <div class="page-title">أخبار <span class="gold">السوق</span></div>
-      <div class="page-sub">آخر الأخبار مع تحليل التأثير</div>
-      <div class="g2">
-        <div class="card" style="padding:0"><div id="newsContainer"></div></div>
-        <div class="card"><div class="card-title">تأثير الأخبار</div><canvas id="newsChart" height="200"></canvas></div>
-      </div>
-    </div>
-
-    <!-- CALENDAR -->
-    <div class="page" id="page-calendar">
-      <div class="page-title">التقويم <span class="gold">الاقتصادي</span></div>
-      <div class="page-sub">أحداث مهمة تؤثر على السوق</div>
-      <div class="card" style="padding:0"><div id="calContainer"></div></div>
-    </div>
-
-    <!-- BACKTESTING -->
-    <div class="page" id="page-backtesting">
-      <div class="page-title">باك <span class="gold">تيستينج</span></div>
-      <div class="page-sub">اختبر استراتيجيتك على بيانات تاريخية</div>
-      <div class="g2">
-        <div class="card">
-          <div class="card-title">إعدادات الاختبار</div>
-          <div class="fg"><label class="fl">العملة</label><select class="fs" id="btCoin"><option>BTC</option><option>ETH</option><option>SOL</option></select></div>
-          <div class="fg"><label class="fl">الاستراتيجية</label><select class="fs" id="btStrat"><option>RSI Oversold/Overbought</option><option>Moving Average Crossover</option><option>MACD Signal</option></select></div>
-          <div class="fg"><label class="fl">الفترة</label><select class="fs"><option>30 يوم</option><option>90 يوم</option><option>6 أشهر</option></select></div>
-          <div class="fg"><label class="fl">رأس المال ($)</label><input type="number" class="fi" id="btCap" value="1000"></div>
-          <button class="btn-pri" style="width:100%" onclick="runBT()">🔄 تشغيل</button>
-          <div id="btResult" style="display:none;margin-top:14px"></div>
-        </div>
-        <div class="card"><div class="card-title">مقارنة الاستراتيجيات</div><canvas id="btChart" height="280"></canvas></div>
-      </div>
-    </div>
-
-    <!-- RISK -->
-    <div class="page" id="page-risk">
-      <div class="page-title">إدارة <span class="gold">المخاطر</span></div>
-      <div class="page-sub">اختر مستوى المخاطرة المناسب</div>
-      <div class="risk-grid">
-        <div class="risk-card low sel" onclick="selRisk(this,'low')"><div class="r-emoji">🛡️</div><div class="r-name">واطي</div><div class="r-pct low">1%—3%</div><div class="r-desc">مثالي للمبتدئين. خسارة محدودة في كل صفقة.</div></div>
-        <div class="risk-card medium" onclick="selRisk(this,'medium')"><div class="r-emoji">⚖️</div><div class="r-name">متوسط</div><div class="r-pct medium">3%—7%</div><div class="r-desc">للمتداولين بخبرة. توازن بين الأمان والعائد.</div></div>
-        <div class="risk-card high" onclick="selRisk(this,'high')"><div class="r-emoji">🔥</div><div class="r-name">عالي</div><div class="r-pct high">7%—15%</div><div class="r-desc">للمحترفين فقط. مخاطر وعوائد أعلى.</div></div>
-      </div>
-      <div class="card"><div class="card-title">حاسبة المخاطرة</div><div id="riskCalc"></div></div>
-    </div>
-
-    <!-- CALCULATOR -->
-    <div class="page" id="page-calculator">
-      <div class="page-title">حاسبة <span class="gold">الصفقة</span></div>
-      <div class="page-sub">احسب حجم الصفقة المناسب</div>
-      <div class="g2">
-        <div class="card">
-          <div class="fg"><label class="fl">رأس المال ($)</label><input type="number" class="fi" id="cCap" oninput="calc()"></div>
-          <div class="fg"><label class="fl">نسبة المخاطرة (%)</label><input type="number" class="fi" id="cRisk" value="2" oninput="calc()"></div>
-          <div class="fg"><label class="fl">سعر الدخول ($)</label><input type="number" class="fi" id="cEntry" oninput="calc()"></div>
-          <div class="fg"><label class="fl">Stop Loss ($)</label><input type="number" class="fi" id="cSL" oninput="calc()"></div>
-          <div class="fg"><label class="fl">Take Profit ($)</label><input type="number" class="fi" id="cTP" oninput="calc()"></div>
-        </div>
-        <div class="card"><div class="card-title">النتائج</div><div id="calcRes"><div style="text-align:center;color:var(--gray);font-size:12px;padding:20px">أدخل بيانات الصفقة</div></div></div>
-      </div>
-    </div>
-
-    <!-- ALERTS -->
-    <div class="page" id="page-alerts">
-      <div class="page-title">التنبيهات <span class="gold">الذكية</span></div>
-      <div class="page-sub">تنبيهات سعرية مخصصة</div>
-      <div class="g2">
-        <div class="card">
-          <div class="fg"><label class="fl">العملة</label><select class="fs" id="aCoin"><option>BTC</option><option>ETH</option><option>SOL</option><option>BNB</option><option>XRP</option></select></div>
-          <div class="fg"><label class="fl">الشرط</label><select class="fs" id="aCond"><option value="above">يتجاوز</option><option value="below">ينزل عن</option></select></div>
-          <div class="fg"><label class="fl">القيمة</label><input type="number" class="fi" id="aVal"></div>
-          <button class="btn-pri" style="width:100%" onclick="addAlert()">+ إضافة</button>
-        </div>
-        <div class="card"><div class="card-title">تنبيهاتك</div><div id="alertsList"></div></div>
-      </div>
-    </div>
-
-    <!-- REPORTS -->
-    <div class="page" id="page-reports">
-      <div class="page-title">تقارير <span class="gold">الأداء</span></div>
-      <div class="page-sub">تحليل شامل لأدائك</div>
-      <div class="g4" style="margin-bottom:16px" id="reportStats"></div>
-      <div class="g2">
-        <div class="card"><div class="card-title">الأداء الأسبوعي</div><canvas id="weekChart" height="200"></canvas></div>
-        <div class="card"><div class="card-title">توزيع العملات</div><canvas id="distChart" height="200"></canvas></div>
-      </div>
-    </div>
-
-    <!-- POINTS -->
-    <div class="page" id="page-points">
-      <div class="page-title">نقاطي <span class="gold">وإنجازاتي</span></div>
-      <div class="page-sub">اكسب نقاطاً وافتح مكافآت</div>
-      <div class="g2" style="margin-bottom:16px">
-        <div class="card" style="text-align:center">
-          <div style="font-family:'Orbitron',monospace;font-size:52px;font-weight:700;color:var(--gold)" id="userPts">0</div>
-          <div style="font-size:12px;color:var(--gray);margin-bottom:16px">نقطة</div>
-          <div style="background:var(--black-4);border-radius:9px;padding:14px;text-align:right">
-            <div style="font-size:10px;color:var(--gold-dark);letter-spacing:2px;margin-bottom:10px">كيف تكسب نقاط</div>
-            <div style="font-size:12px;color:var(--gray);line-height:2">✅ تسجيل صفقة: +10<br>👥 دعوة صديق: +50<br>🤖 سؤال AI: +3<br>🎯 صفقة رابحة: +20</div>
-          </div>
-        </div>
-        <div class="card"><div class="card-title">لوحة المتصدرين</div><div id="leaderboard"></div></div>
-      </div>
-      <div class="card"><div class="card-title">الشارات</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="badges"></div></div>
-    </div>
-
-    <!-- REFERRAL -->
-    <div class="page" id="page-referral">
-      <div class="page-title">نظام <span class="gold">الإحالة</span></div>
-      <div class="page-sub">ادعُ أصدقاءك واكسب نقاطاً</div>
-      <div class="g2">
-        <div class="card">
-          <div style="background:var(--black-4);border:1px solid rgba(201,168,76,0.25);border-radius:9px;padding:20px;text-align:center;margin-bottom:14px">
-            <div style="font-size:10px;color:var(--gray);letter-spacing:2px;margin-bottom:10px">كودك</div>
-            <div style="font-family:'Orbitron',monospace;font-size:24px;font-weight:700;color:var(--gold);letter-spacing:4px" id="refCode">EAM-0000</div>
-          </div>
-          <button class="btn-pri" style="width:100%" onclick="copyRef()">📋 نسخ الرابط</button>
-        </div>
-        <div class="card">
-          <div class="card-title">المكافآت</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="background:var(--black-4);border-radius:8px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">1 شخص</div><div style="font-size:11px;color:var(--gray)">يسجل بكودك</div></div><div style="font-family:'Orbitron',monospace;color:var(--gold)">+50 نقطة</div></div>
-            <div style="background:var(--black-4);border-radius:8px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">5 أشخاص</div><div style="font-size:11px;color:var(--gray)">شهر مجاني</div></div><div style="font-family:'Orbitron',monospace;color:var(--gold)">1 شهر 🎁</div></div>
-          </div>
+    <div class="card" style="margin-bottom:12px">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">📅 21 مارس 2026 | كريبتو</div>
+        <h3 style="font-size:16px;margin-bottom:8px">إيثيريوم يتجاوز حاجز $3,500 بعد تحديث جديد</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.6">تخطى سعر إيثيريوم مستوى $3,500 للأول مرة منذ شهر إثر نجاح تحديث الشبكة الذي أدى إلى تحسين السرعة وخفض الرسوم.</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+          <span class="status-badge profit">فرصة شراء</span>
+          <span style="font-size:12px;color:var(--green)">📈 ETH +4.1%</span>
         </div>
       </div>
     </div>
-
-    <!-- SETTINGS -->
-    <div class="page" id="page-settings">
-      <div class="page-title">الإعدادات <span class="gold">الشخصية</span></div>
-      <div class="page-sub">خصّص تجربتك</div>
-      <div class="g2">
-        <div class="card">
-          <div class="card-title">معلوماتي</div>
-          <div class="fg"><label class="fl">الاسم</label><input type="text" class="fi" id="uName" placeholder="اسمك"></div>
-          <div class="fg"><label class="fl">رأس المال ($)</label><input type="number" class="fi" id="uCap" placeholder="1000" oninput="uCapital=parseFloat(this.value)||0"></div>
-          <div class="fg"><label class="fl">مستوى المخاطرة</label><select class="fs" id="uRisk"><option value="low">واطي (1-3%)</option><option value="medium" selected>متوسط (3-7%)</option><option value="high">عالي (7-15%)</option></select></div>
-          <button class="btn-pri" onclick="saveSettings()">💾 حفظ</button>
-        </div>
-        <div class="card">
-          <div class="card-title">الإشعارات</div>
-          <div class="s-row"><div class="s-name">ملخص الصباح</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="s-row"><div class="s-name">فرص التداول</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="s-row"><div class="s-name">الأخبار المهمة</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="s-row"><div class="s-name">التقرير الأسبوعي</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="s-row"><div class="s-name">الوضع الهادئ ليلاً</div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div class="card">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">📅 20 مارس 2026 | تحذير</div>
+        <h3 style="font-size:16px;margin-bottom:8px">تحذيرات من تصاعد التوترات الجيوسياسية وتأثيرها على الأسواق</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.6">حذّر محللون من أن استمرار التوترات الجيوسياسية قد يضغط على أسواق الكريبتو والأسهم خلال الفترة القادمة.</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+          <span class="status-badge loss">تأثير سلبي محتمل</span>
+          <span style="font-size:12px;color:var(--red-price)">⚠️ احتياط وتحوط</span>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-  </div><!-- end main -->
-</div><!-- end app -->
+<!-- CALENDAR -->
+<div class="page" id="page-calendar">
+  <div class="page-header">
+    <h1>التقويم <span>الاقتصادي</span></h1>
+    <p>أهم الأحداث الاقتصادية القادمة</p>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>التاريخ</th><th>الحدث</th><th>البلد</th><th>الأهمية</th><th>التأثير المتوقع</th></tr></thead>
+        <tbody>
+          <tr><td>25 مارس</td><td>قرار الفائدة الأمريكي</td><td>🇺🇸 USA</td><td><span style="color:var(--red-price)">🔴 عالية</span></td><td><span style="color:var(--gold)">تقلبات عالية</span></td></tr>
+          <tr><td>26 مارس</td><td>بيانات التضخم الأوروبي</td><td>🇪🇺 EUR</td><td><span style="color:var(--gold)">🟡 متوسطة</span></td><td><span style="color:var(--green)">ضغط بسيط</span></td></tr>
+          <tr><td>28 مارس</td><td>مبيعات التجزئة الأمريكي</td><td>🇺🇸 USA</td><td><span style="color:var(--gold)">🟡 متوسطة</span></td><td><span style="color:var(--text2)">تأثير محدود</span></td></tr>
+          <tr><td>1 أبريل</td><td>تقرير الوظائف الأمريكي NFP</td><td>🇺🇸 USA</td><td><span style="color:var(--red-price)">🔴 عالية جداً</span></td><td><span style="color:var(--gold)">تقلبات عالية جداً</span></td></tr>
+          <tr><td>3 أبريل</td><td>اجتماع البنك المركزي الأوروبي</td><td>🇪🇺 EUR</td><td><span style="color:var(--red-price)">🔴 عالية</span></td><td><span style="color:var(--gold)">مراقبة</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-<!-- ANALYSIS MODAL -->
-<div class="modal-ov" id="modal">
-  <div class="modal-box" id="modalContent">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+<!-- COURSE -->
+<div class="page" id="page-course">
+  <div class="page-header">
+    <h1>كورس <span>التداول</span></h1>
+    <p>من الصفر إلى المحترف — مجاناً</p>
+  </div>
+  <div class="course-header">
+    <h2>تعلم التداول مع <span>EAM Trading</span></h2>
+    <p>دورة شاملة ومفصلة تأخذك من مبتدئ كامل إلى متداول محترف — مع شرح بالصور، أمثلة حقيقية، واختبارات تفاعلية</p>
+    <div class="course-stats">
+      <div class="course-stat"><strong>8</strong> وحدات</div>
+      <div class="course-stat"><strong>42</strong> درس</div>
+      <div class="course-stat"><strong>٦+</strong> ساعات</div>
+      <div class="course-stat"><strong>مجاناً</strong> بالكامل</div>
+    </div>
+  </div>
+  <div class="chapter-list">
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num">1</div>
+        <div class="ch-info">
+          <div class="ch-title">أساسيات التداول — ما هو التداول وكيف يعمل؟</div>
+          <div class="ch-meta"><span>6 دروس</span><span>45 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct done">100%</div><div style="font-size:11px;color:var(--green)">مكتمل ✅</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item done" onclick="openLesson('lesson-1-1',event)"><span class="lesson-icon">✅</span><span class="lesson-title">ما هو التداول وما هي البورصة؟</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-1-2',event)"><span class="lesson-icon">✅</span><span class="lesson-title">الفرق بين الاستثمار والمضاربة</span><span class="lesson-dur">7 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-1-3',event)"><span class="lesson-icon">✅</span><span class="lesson-title">أنواع الأسواق المالية</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-1-4',event)"><span class="lesson-icon">✅</span><span class="lesson-title">كيف تقرأ الشارت؟</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-1-5',event)"><span class="lesson-icon">✅</span><span class="lesson-title">الشموع اليابانية — الأساس</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-1-6',event)"><span class="lesson-icon">📝</span><span class="lesson-title">اختبار الوحدة الأولى</span><span class="lesson-dur">5 د</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num">2</div>
+        <div class="ch-info">
+          <div class="ch-title">التحليل الفني — قراءة السوق كالمحترفين</div>
+          <div class="ch-meta"><span>8 دروس</span><span>65 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct inprogress">60%</div><div style="font-size:11px;color:var(--gold)">جاري... ⭐</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item done" onclick="openLesson('lesson-2-1',event)"><span class="lesson-icon">✅</span><span class="lesson-title">مؤشر RSI — كيف تستخدمه؟</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-2-2',event)"><span class="lesson-icon">✅</span><span class="lesson-title">مؤشر MACD بالتفصيل</span><span class="lesson-dur">15 د</span></div>
+          <div class="lesson-item done" onclick="openLesson('lesson-2-3',event)"><span class="lesson-icon">✅</span><span class="lesson-title">المتوسطات المتحركة MA و EMA</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-2-4',event)"><span class="lesson-icon">📖</span><span class="lesson-title">خطوط الدعم والمقاومة</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-2-5',event)"><span class="lesson-icon">📖</span><span class="lesson-title">أنماط الشموع المهمة</span><span class="lesson-dur">15 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-2-6',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Bollinger Bands</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-2-7',event)"><span class="lesson-icon">📖</span><span class="lesson-title">حجم التداول وأهميته</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-2-8',event)"><span class="lesson-icon">📝</span><span class="lesson-title">اختبار الوحدة الثانية</span><span class="lesson-dur">5 د</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num locked">3</div>
+        <div class="ch-info">
+          <div class="ch-title">إدارة المخاطر — الفرق بين الربح والخسارة</div>
+          <div class="ch-meta"><span>6 دروس</span><span>50 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct" style="color:var(--text2)">0%</div><div style="font-size:11px;color:var(--text2)">لم يبدأ</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item" onclick="openLesson('lesson-3-1',event)"><span class="lesson-icon">📖</span><span class="lesson-title">ما هي إدارة المخاطر ولماذا هي ضرورية؟</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-3-2',event)"><span class="lesson-icon">📖</span><span class="lesson-title">كيف تحسب حجم الصفقة المناسب</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-3-3',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Stop Loss و Take Profit — متى وأين؟</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-3-4',event)"><span class="lesson-icon">📖</span><span class="lesson-title">نسبة الربح/خسارة R:R Ratio</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-3-5',event)"><span class="lesson-icon">📖</span><span class="lesson-title">أخطاء المبتدئين الأكثر شيوعاً</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-3-6',event)"><span class="lesson-icon">📝</span><span class="lesson-title">اختبار الوحدة الثالثة</span><span class="lesson-dur">5 د</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num locked">4</div>
+        <div class="ch-info">
+          <div class="ch-title">التحليل الأساسي — الأخبار والاقتصاد</div>
+          <div class="ch-meta"><span>5 دروس</span><span>40 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct" style="color:var(--text2)">0%</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item" onclick="openLesson('lesson-4-1',event)"><span class="lesson-icon">📖</span><span class="lesson-title">كيف تؤثر الأخبار على السوق؟</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-4-2',event)"><span class="lesson-icon">📖</span><span class="lesson-title">التقويم الاقتصادي — كيف تستخدمه؟</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-4-3',event)"><span class="lesson-icon">📖</span><span class="lesson-title">قرارات الفائدة وتأثيرها</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-4-4',event)"><span class="lesson-icon">📖</span><span class="lesson-title">تقرير NFP والأسواق</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-4-5',event)"><span class="lesson-icon">📝</span><span class="lesson-title">اختبار الوحدة الرابعة</span><span class="lesson-dur">5 د</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num locked">5</div>
+        <div class="ch-info">
+          <div class="ch-title">الكريبتو — عالم العملات الرقمية</div>
+          <div class="ch-meta"><span>7 دروس</span><span>55 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct" style="color:var(--text2)">0%</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item" onclick="openLesson('lesson-5-1',event)"><span class="lesson-icon">📖</span><span class="lesson-title">ما هي العملات الرقمية؟</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-2',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Bitcoin — الملك الرقمي</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-3',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Ethereum والعقود الذكية</span><span class="lesson-dur">10 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-4',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Altcoins وكيف تختار منها</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-5',event)"><span class="lesson-icon">📖</span><span class="lesson-title">البورصات ومقارنة بينها</span><span class="lesson-dur">8 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-6',event)"><span class="lesson-icon">📖</span><span class="lesson-title">حفظ العملات بأمان — الكولد ووليت</span><span class="lesson-dur">7 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-5-7',event)"><span class="lesson-icon">📝</span><span class="lesson-title">اختبار الوحدة الخامسة</span><span class="lesson-dur">5 د</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(this)">
+      <div class="chapter-header">
+        <div class="ch-num locked">6</div>
+        <div class="ch-info">
+          <div class="ch-title">استراتيجيات متقدمة للمحترفين</div>
+          <div class="ch-meta"><span>5 دروس</span><span>60 دقيقة</span></div>
+        </div>
+        <div class="ch-progress"><div class="ch-pct" style="color:var(--text2)">0%</div></div>
+      </div>
+      <div class="chapter-content">
+        <div class="lesson-list">
+          <div class="lesson-item" onclick="openLesson('lesson-6-1',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Scalping — التداول السريع</span><span class="lesson-dur">15 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-6-2',event)"><span class="lesson-icon">📖</span><span class="lesson-title">Swing Trading</span><span class="lesson-dur">15 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-6-3',event)"><span class="lesson-icon">📖</span><span class="lesson-title">التداول على الأخبار</span><span class="lesson-dur">12 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-6-4',event)"><span class="lesson-icon">📖</span><span class="lesson-title">بناء نظام تداول ناجح</span><span class="lesson-dur">15 د</span></div>
+          <div class="lesson-item" onclick="openLesson('lesson-6-5',event)"><span class="lesson-icon">📝</span><span class="lesson-title">الاختبار النهائي</span><span class="lesson-dur">10 د</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="page" id="page-alerts">
+  <div class="page-header">
+    <h1>إدارة <span>التنبيهات</span></h1>
+    <p>تحكم كامل في متى وكيف تستلم التنبيهات</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <h3 style="margin-bottom:16px">إضافة تنبيه سعري</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div class="form-group" style="margin:0">
+        <label class="form-label">العملة</label>
+        <select class="form-input" style="width:150px" id="alertCoin">
+          <option>BTC/USD</option><option>ETH/USD</option><option>SOL/USD</option><option>BNB/USD</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="form-label">الشرط</label>
+        <select class="form-input" style="width:130px" id="alertCond">
+          <option>يصل إلى</option><option>يتجاوز</option><option>ينخفض عن</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="form-label">السعر ($)</label>
+        <input type="number" class="form-input" style="width:150px" id="alertPrice" placeholder="70000">
+      </div>
+      <button class="btn btn-gold" onclick="addAlert()">+ إضافة</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:16px">تنبيهاتك النشطة</h3>
+    <div id="alertsList">
+      <div class="alert-item">
+        <span class="alert-icon">🔔</span>
+        <div class="alert-text">
+          <strong>BTC/USD يصل إلى $70,000</strong>
+          <span>أضيف في 20 مارس 2026</span>
+        </div>
+        <div class="alert-actions">
+          <span class="status-badge open">نشط</span>
+          <button class="btn btn-sm btn-red" onclick="removeAlert(this)">حذف</button>
+        </div>
+      </div>
+      <div class="alert-item">
+        <span class="alert-icon">🔔</span>
+        <div class="alert-text">
+          <strong>ETH/USD ينخفض عن $3,000</strong>
+          <span>أضيف في 19 مارس 2026</span>
+        </div>
+        <div class="alert-actions">
+          <span class="status-badge open">نشط</span>
+          <button class="btn btn-sm btn-red" onclick="removeAlert(this)">حذف</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="page" id="page-achievements">
+  <div class="page-header">
+    <h1>الإنجازات <span>والنقاط</span></h1>
+    <p>تتبع تقدمك وافتخر بإنجازاتك</p>
+  </div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">🏆</div>
+      <div class="card-value" style="color:var(--gold);font-size:36px">1,240</div>
+      <div class="card-title" style="justify-content:center">نقطة مكتسبة</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">تقدمك نحو المستوى التالي</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">المستوى الحالي: متداول مبتدئ ⭐</p>
+      <div class="progress-bar" style="margin-bottom:6px"><div class="progress-fill gold" style="width:62%"></div></div>
+      <p style="font-size:12px;color:var(--text2)">1,240 / 2,000 نقطة نحو <strong style="color:var(--gold)">متداول متوسط ⭐⭐</strong></p>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:16px">شاراتك</h3>
+    <div class="badges-grid">
+      <div class="badge-item earned"><div class="badge-icon">🎯</div><div class="badge-name">أول صفقة</div></div>
+      <div class="badge-item earned"><div class="badge-icon">📈</div><div class="badge-name">أول ربح</div></div>
+      <div class="badge-item earned"><div class="badge-icon">🔥</div><div class="badge-name">3 أيام متتالية</div></div>
+      <div class="badge-item earned"><div class="badge-icon">🎓</div><div class="badge-name">أتممت درساً</div></div>
+      <div class="badge-item earned"><div class="badge-icon">💪</div><div class="badge-name">لم تخسر أسبوعاً</div></div>
+      <div class="badge-item"><div class="badge-icon">🏆</div><div class="badge-name">10 صفقات ناجحة</div></div>
+      <div class="badge-item"><div class="badge-icon">🌟</div><div class="badge-name">خبير التحليل</div></div>
+      <div class="badge-item"><div class="badge-icon">💎</div><div class="badge-name">مضى شهر</div></div>
+      <div class="badge-item"><div class="badge-icon">🚀</div><div class="badge-name">ربح 10 ضعف</div></div>
+      <div class="badge-item"><div class="badge-icon">👑</div><div class="badge-name">متداول محترف</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div class="page" id="page-reports">
+  <div class="page-header">
+    <h1>التقارير <span>الدورية</span></h1>
+    <p>تحليل كامل لأدائك</p>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    <button class="btn btn-outline" onclick="showReport('weekly')">أسبوعي</button>
+    <button class="btn btn-gold" onclick="showReport('monthly')">شهري</button>
+    <button class="btn btn-outline" onclick="showReport('yearly')">سنوي</button>
+  </div>
+  <div class="grid-4">
+    <div class="card"><div class="card-title">📊 إجمالي الصفقات</div><div class="card-value">23</div></div>
+    <div class="card"><div class="card-title">✅ الرابحة</div><div class="card-value" style="color:var(--green)">16</div></div>
+    <div class="card"><div class="card-title">❌ الخاسرة</div><div class="card-value" style="color:var(--red-price)">7</div></div>
+    <div class="card"><div class="card-title">💰 صافي الربح</div><div class="card-value" style="color:var(--gold)">+$860</div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <h3 style="margin-bottom:16px">تحليل نفسي — أفضل أوقاتك</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="bt-stat"><span>أفضل وقت للتداول</span><span class="pos">الصباح (9am - 12pm)</span></div>
+      <div class="bt-stat"><span>أسوأ وقت</span><span class="neg">الليل (10pm - 2am)</span></div>
+      <div class="bt-stat"><span>أفضل عملة لك</span><span class="pos">BTC/USD (78% نجاح)</span></div>
+      <div class="bt-stat"><span>أسوأ عملة</span><span class="neg">DOGE/USD (35% نجاح)</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3>تقرير PDF</h3>
+      <button class="btn btn-gold btn-sm" onclick="downloadReport()">⬇️ تحميل PDF</button>
+    </div>
+    <p style="font-size:14px;color:var(--text2)">تقرير شامل بجميع صفقاتك وإحصائياتك جاهز للطباعة</p>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="page-header">
+    <h1>الإعدادات <span>الشخصية</span></h1>
+    <p>تخصيص تجربتك في المنصة</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="settings-group">
+      <h4>👤 معلومات الحساب</h4>
+      <div class="setting-row">
+        <div><div class="setting-label">الاسم</div></div>
+        <input type="text" class="input-field" id="settingName" value="مستخدم">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">رأس المال الابتدائي</div></div>
+        <input type="number" class="input-field" id="settingCapital" value="10000">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">مستوى المخاطرة الافتراضي</div></div>
+        <select class="input-field" style="width:220px">
+          <option>واطي (1-3%)</option><option selected>متوسط (3-7%)</option><option>عالي (7-15%)</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" style="margin-top:12px" onclick="saveSettings()">حفظ التغييرات</button>
+    </div>
+    <div class="settings-group">
+      <h4>🔔 إعدادات الإشعارات</h4>
+      <div class="setting-row">
+        <div><div class="setting-label">إشعارات الفرص</div><div class="setting-sub">تنبيه عند ظهور فرصة تداول</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">ملخص الصبح اليومي</div><div class="setting-sub">تقرير السوق كل يوم 9 صباحاً</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">تنبيهات الأسعار</div><div class="setting-sub">عند وصول السعر للهدف</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">إشعارات الأخبار</div><div class="setting-sub">أخبار مهمة تؤثر على السوق</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h4>🔐 الأمان</h4>
+      <div class="setting-row">
+        <div><div class="setting-label">المصادقة الثنائية (2FA)</div><div class="setting-sub">حماية إضافية لحسابك</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">إشعار الدخول من جهاز جديد</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <div class="admin-header">
+    <div class="admin-icon">👑</div>
+    <div class="admin-header-text">
+      <h2>لوحة الإدارة — EAM Trading</h2>
+      <p>تحكم كامل بالمنصة والمستخدمين والإعدادات</p>
+    </div>
+  </div>
+  <div class="grid-4" style="margin-bottom:24px">
+    <div class="card" style="text-align:center"><div class="admin-stat-val" id="totalUsers">12</div><div class="admin-stat-label">إجمالي المستخدمين</div></div>
+    <div class="card" style="text-align:center"><div class="admin-stat-val" style="color:var(--green)">8</div><div class="admin-stat-label">نشطون اليوم</div></div>
+    <div class="card" style="text-align:center"><div class="admin-stat-val">47</div><div class="admin-stat-label">صفقات مسجلة</div></div>
+    <div class="card" style="text-align:center"><div class="admin-stat-val" style="color:var(--green)">99.2%</div><div class="admin-stat-label">وقت تشغيل الموقع</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="margin-bottom:16px">👥 إدارة المستخدمين</h3>
+      <div class="table-wrap">
+        <table id="usersTable">
+          <thead><tr><th>المستخدم</th><th>الإيميل</th><th>الدور</th><th>الحالة</th><th>إجراء</th></tr></thead>
+          <tbody id="usersBody">
+            <tr>
+              <td>مدير النظام</td><td>admin@eam.com</td>
+              <td><span class="status-badge" style="background:rgba(255,215,0,0.15);color:var(--gold)">أدمن</span></td>
+              <td><span class="status-badge open">نشط</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>مستخدم عادي</td><td>user@eam.com</td>
+              <td><span class="status-badge closed">مستخدم</span></td>
+              <td><span class="status-badge open">نشط</span></td>
+              <td><button class="btn btn-sm btn-outline" onclick="banUser(this)">حظر</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:16px">⚙️ إعدادات الموقع</h3>
+      <div class="settings-group">
+        <div class="setting-row">
+          <div><div class="setting-label">اسم الموقع</div></div>
+          <input type="text" class="input-field" value="EAM Trading" id="adminSiteName">
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">وضع الصيانة</div><div class="setting-sub">إيقاف الموقع مؤقتاً</div></div>
+          <div class="toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">تسجيل مستخدمين جدد</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">الوضع المدفوع</div><div class="setting-sub">تفعيل الاشتراكات المدفوعة</div></div>
+          <div class="toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <button class="btn btn-gold" style="margin-top:16px;width:100%" onclick="saveAdminSettings()">حفظ الإعدادات</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:16px">📢 إرسال إشعار للمستخدمين</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input type="text" class="form-input" id="broadcastTitle" placeholder="عنوان الإشعار">
+      <textarea class="form-input" id="broadcastMsg" placeholder="نص الإشعار..." style="height:80px;resize:none"></textarea>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-gold" onclick="sendBroadcast()">📤 إرسال للكل</button>
+        <button class="btn btn-outline" onclick="sendBroadcast('test')">🧪 اختبار فقط</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:16px">🎨 إعدادات الهوية البصرية</h3>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <div>
+        <label class="form-label">لون الموقع الرئيسي</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <div onclick="setThemeColor('#FFD700')" style="width:32px;height:32px;border-radius:6px;background:#FFD700;cursor:pointer;border:2px solid var(--gold)"></div>
+          <div onclick="setThemeColor('#00c853')" style="width:32px;height:32px;border-radius:6px;background:#00c853;cursor:pointer"></div>
+          <div onclick="setThemeColor('#2979ff')" style="width:32px;height:32px;border-radius:6px;background:#2979ff;cursor:pointer"></div>
+          <div onclick="setThemeColor('#ff6d00')" style="width:32px;height:32px;border-radius:6px;background:#ff6d00;cursor:pointer"></div>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">روابط السوشيال ميديا</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+          <input type="text" class="input-field" placeholder="رابط تيليغرام" style="width:220px">
+          <input type="text" class="input-field" placeholder="رابط انستغرام" style="width:220px">
+          <input type="text" class="input-field" placeholder="رابط يوتيوب" style="width:220px">
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showToast('✅','تم حفظ الإعدادات','تم تطبيق الإعدادات البصرية بنجاح')">حفظ</button>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end appScreen -->
+
+<!-- LESSON MODAL -->
+<div class="modal-overlay" id="lessonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="lessonTitle">عنوان الدرس</h3>
+      <button class="modal-close" onclick="closeLesson()">✕</button>
+    </div>
+    <div class="modal-body" id="lessonBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon">✅</div>
+  <div class="toast-text">
+    <strong id="toastTitle">تنبيه</strong>
+    <span id="toastMsg">--</span>
   </div>
 </div>
 
 <script>
-// ===== SUPABASE =====
-const SUPABASE_URL = 'https://bggcxfpuefxalnssskaa.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_QHTfeuwNcpgVyJVlVdFizA_Y_mdMbbg';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
+// ============ AUTH ============
+const USERS = {
+  'admin@eam.com': { pass:'admin123', name:'مدير النظام', role:'admin', capital:10000, points:5000 },
+  'user@eam.com':  { pass:'user123',  name:'مستخدم عادي', role:'user',  capital:10000, points:1240 }
+};
 let currentUser = null;
-let uCapital = 0;
-let uRisk = 'low';
-let uPoints = 0;
-let alerts = [];
-let trades = [];
 
-// ===== COINS DATA =====
-const coins = [
-  {id:'BTC',name:'Bitcoin',cls:'btc',price:87420,change:2.34,rsi:58,ma20:85000,ma50:82000,macd:1.2,signal:'buy',entry:87200,tp:91500,sl:84800,time:'4 ساعات',success:73},
-  {id:'ETH',name:'Ethereum',cls:'eth',price:2180,change:-1.2,rsi:42,ma20:2250,ma50:2100,macd:-0.5,signal:'wait',entry:2150,tp:2380,sl:2050,time:'6 ساعات',success:61},
-  {id:'SOL',name:'Solana',cls:'sol',price:132,change:4.7,rsi:31,ma20:125,ma50:118,macd:2.1,signal:'buy',entry:131,tp:148,sl:124,time:'3 ساعات',success:68},
-  {id:'BNB',name:'BNB',cls:'bnb',price:598,change:0.8,rsi:52,ma20:590,ma50:575,macd:0.3,signal:'wait',entry:595,tp:635,sl:578,time:'8 ساعات',success:58},
-  {id:'XRP',name:'Ripple',cls:'xrp',price:2.14,change:-2.8,rsi:72,ma20:2.30,ma50:2.10,macd:-1.8,signal:'sell',entry:2.15,tp:1.95,sl:2.28,time:'2 ساعات',success:65},
-  {id:'ADA',name:'Cardano',cls:'ada',price:0.68,change:1.5,rsi:45,ma20:0.65,ma50:0.62,macd:0.8,signal:'buy',entry:0.67,tp:0.78,sl:0.63,time:'5 ساعات',success:62},
-  {id:'DOGE',name:'Dogecoin',cls:'doge',price:0.142,change:-0.5,rsi:48,ma20:0.138,ma50:0.130,macd:-0.2,signal:'wait',entry:0.140,tp:0.165,sl:0.130,time:'12 ساعات',success:55},
-  {id:'DOT',name:'Polkadot',cls:'dot',price:5.82,change:3.2,rsi:38,ma20:5.60,ma50:5.40,macd:1.5,signal:'buy',entry:5.78,tp:6.50,sl:5.40,time:'6 ساعات',success:64},
-  {id:'AVAX',name:'Avalanche',cls:'avax',price:22.4,change:-1.8,rsi:65,ma20:23.0,ma50:21.5,macd:-0.9,signal:'wait',entry:22.0,tp:25.0,sl:20.5,time:'4 ساعات',success:60}
-];
-
-// ===== AUTH =====
-async function initAuth() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    showApp();
-  } else {
-    showAuth();
-  }
-  document.getElementById('loadingScreen').classList.add('hidden');
-}
-
-function showAuth() {
-  document.getElementById('authScreen').classList.remove('hidden');
-  document.getElementById('app').classList.remove('visible');
-}
-
-function showApp() {
-  document.getElementById('authScreen').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
-  setupUser();
-  buildTicker();
-  buildMarket();
-  buildSummary();
-  setInterval(updatePrices, 15000);
-}
-
-function setupUser() {
-  const email = currentUser.email;
-  const initial = email.charAt(0).toUpperCase();
-  document.getElementById('userAvatar').textContent = initial;
-  document.getElementById('userEmailDisplay').textContent = email;
-  const code = 'EAM-' + email.substring(0,4).toUpperCase();
-  document.getElementById('refCode').textContent = code;
-  document.getElementById('uName').value = currentUser.user_metadata?.name || '';
-  loadUserData();
-}
-
-async function loadUserData() {
-  try {
-    const { data } = await sb.from('user_profiles').select('*').eq('user_id', currentUser.id).single();
-    if (data) {
-      uCapital = data.capital || 0;
-      uRisk = data.risk_level || 'low';
-      uPoints = data.points || 0;
-      document.getElementById('uCap').value = uCapital;
-      document.getElementById('uRisk').value = uRisk;
-    }
-  } catch(e) {}
-}
-
-async function saveUserData() {
-  try {
-    await sb.from('user_profiles').upsert({
-      user_id: currentUser.id,
-      capital: uCapital,
-      risk_level: uRisk,
-      points: uPoints,
-      updated_at: new Date().toISOString()
-    });
-  } catch(e) {}
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
   document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
-  document.getElementById('signupForm').style.display = tab==='signup'?'block':'none';
-  document.getElementById('authError').style.display = 'none';
-  document.getElementById('authSuccess').style.display = 'none';
+  document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
 }
 
-function showAuthError(msg) {
-  const el = document.getElementById('authError');
-  el.textContent = msg; el.style.display = 'block';
-  document.getElementById('authSuccess').style.display = 'none';
-}
-
-function showAuthSuccess(msg) {
-  const el = document.getElementById('authSuccess');
-  el.textContent = msg; el.style.display = 'block';
-  document.getElementById('authError').style.display = 'none';
-}
-
-async function handleLogin() {
+function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if(!email||!password) { showAuthError('أدخل الإيميل وكلمة السر'); return; }
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = 'جاري الدخول...';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { showAuthError('خطأ: ' + (error.message==='Invalid login credentials'?'إيميل أو كلمة سر غلط':error.message)); btn.disabled=false; btn.textContent='تسجيل الدخول'; }
-  else { currentUser = data.user; showApp(); }
+  const pass  = document.getElementById('loginPass').value;
+  const user  = USERS[email];
+  if (!user || user.pass !== pass) { showToast('❌','خطأ','البريد أو كلمة المرور غير صحيحة'); return; }
+  currentUser = { ...user, email };
+  startApp();
 }
 
-async function handleSignup() {
-  const name = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  if(!name||!email||!password) { showAuthError('أدخل كل البيانات'); return; }
-  if(password.length < 6) { showAuthError('كلمة السر قصيرة جداً — 6 أحرف على الأقل'); return; }
-  const btn = document.getElementById('signupBtn');
-  btn.disabled = true; btn.textContent = 'جاري الإنشاء...';
-  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name } } });
-  if (error) { showAuthError('خطأ: ' + error.message); btn.disabled=false; btn.textContent='إنشاء حساب مجاني'; }
-  else {
-    if(data.user && !data.session) showAuthSuccess('✅ تم إرسال رسالة تأكيد على إيميلك — تحقق منه!');
-    else { currentUser = data.user; showApp(); }
-    btn.disabled=false; btn.textContent='إنشاء حساب مجاني';
+function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass  = document.getElementById('regPass').value;
+  if (!name||!email||!pass) { showToast('⚠️','تنبيه','يرجى ملء جميع الحقول'); return; }
+  if (pass.length < 6) { showToast('⚠️','تنبيه','كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
+  USERS[email] = { pass, name, role:'user', capital:10000, points:0 };
+  currentUser = { ...USERS[email], email };
+  startApp();
+}
+
+function startApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userNameNav').textContent = currentUser.name;
+  document.getElementById('userAvatarNav').textContent = currentUser.name.charAt(0);
+  document.getElementById('welcomeName').textContent = currentUser.name;
+  document.getElementById('userPoints').textContent = currentUser.points.toLocaleString();
+  document.getElementById('capitalVal').textContent = '$'+currentUser.capital.toLocaleString();
+  document.getElementById('settingName').value = currentUser.name;
+  document.getElementById('settingCapital').value = currentUser.capital;
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('ar-EG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if (currentUser.role === 'admin') {
+    document.getElementById('adminNavItem').style.display = 'flex';
+    document.getElementById('userLevelNav').textContent = '👑 مدير النظام';
+  }
+  fetchPrices();
+  setInterval(fetchPrices, 30000);
+  buildSignals();
+  showToast('✅', 'أهلاً '+currentUser.name, 'تم تسجيل الدخول بنجاح 🚀');
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+}
+
+// ============ NAVIGATION ============
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active'); });
+}
+
+// ============ PRICES (CoinGecko) ============
+let priceData = {};
+
+async function fetchPrices() {
+  try {
+    const ids = 'bitcoin,ethereum,binancecoin,solana,ripple,avalanche-2,dogecoin,cardano';
+    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+    const data = await res.json();
+    priceData = {
+      'BTC': { price: data.bitcoin?.usd, change: data.bitcoin?.usd_24h_change, name:'Bitcoin' },
+      'ETH': { price: data.ethereum?.usd, change: data.ethereum?.usd_24h_change, name:'Ethereum' },
+      'BNB': { price: data.binancecoin?.usd, change: data.binancecoin?.usd_24h_change, name:'BNB' },
+      'SOL': { price: data.solana?.usd, change: data.solana?.usd_24h_change, name:'Solana' },
+      'XRP': { price: data.ripple?.usd, change: data.ripple?.usd_24h_change, name:'XRP' },
+      'AVAX':{ price: data['avalanche-2']?.usd, change: data['avalanche-2']?.usd_24h_change, name:'Avalanche' },
+      'DOGE':{ price: data.dogecoin?.usd, change: data.dogecoin?.usd_24h_change, name:'Dogecoin' },
+      'ADA': { price: data.cardano?.usd, change: data.cardano?.usd_24h_change, name:'Cardano' }
+    };
+    updateTicker();
+    updateMarketCards();
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ar');
+  } catch(e) {
+    // Fallback demo prices
+    priceData = {
+      'BTC':{'price':67840,'change':2.3,'name':'Bitcoin'},
+      'ETH':{'price':3520,'change':-1.1,'name':'Ethereum'},
+      'BNB':{'price':602,'change':0.8,'name':'BNB'},
+      'SOL':{'price':165,'change':3.2,'name':'Solana'},
+      'XRP':{'price':0.58,'change':-0.5,'name':'XRP'},
+      'AVAX':{'price':38.5,'change':1.4,'name':'Avalanche'},
+      'DOGE':{'price':0.18,'change':5.1,'name':'Dogecoin'},
+      'ADA':{'price':0.64,'change':-0.9,'name':'Cardano'}
+    };
+    updateTicker(); updateMarketCards();
   }
 }
 
-async function handleLogout() {
-  await sb.auth.signOut();
-  currentUser = null;
-  showAuth();
+function fmtPrice(p) {
+  if (!p) return '--';
+  if (p >= 1000) return '$'+p.toLocaleString('en',{maximumFractionDigits:0});
+  if (p >= 1) return '$'+p.toFixed(2);
+  return '$'+p.toFixed(4);
 }
 
-async function handleForgotPassword() {
-  const email = document.getElementById('loginEmail').value.trim();
-  if(!email) { showAuthError('أدخل إيميلك أولاً'); return; }
-  await sb.auth.resetPasswordForEmail(email);
-  showAuthSuccess('✅ تم إرسال رابط إعادة تعيين كلمة السر!');
+function fmtChange(c) {
+  if (c == null) return '--';
+  return (c>=0?'+':'')+c.toFixed(2)+'%';
 }
 
-// ===== NAVIGATION =====
-function go(page) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.s-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
-  if(page==='portfolio') buildPortfolio();
-  if(page==='trades') buildTrades();
-  if(page==='news') { buildNews(); buildNewsChart(); }
-  if(page==='calendar') buildCalendar();
-  if(page==='reports') buildReports();
-  if(page==='points') buildPoints();
-  if(page==='risk') buildRiskCalc();
-  if(page==='backtesting') buildBTChart();
-  if(page==='alerts') buildAlerts();
+function getSignal(symbol, change) {
+  // Simple signal based on price change as demo
+  const c = change || 0;
+  if (c > 2) return 'buy';
+  if (c < -2) return 'sell';
+  return 'wait';
 }
 
-// ===== TICKER =====
-function buildTicker() {
-  const t = document.getElementById('tickerTrack');
-  t.innerHTML = [...coins,...coins].map(c=>`
-    <div class="ticker-item">
-      <span class="ticker-name">${c.id}</span>
-      <span>$${c.price.toLocaleString()}</span>
-      <span class="${c.change>=0?'up':'down'}">${c.change>=0?'▲':'▼'}${Math.abs(c.change)}%</span>
-    </div>`).join('');
+function getRSI(change) {
+  const base = 50 + (change || 0) * 2;
+  return Math.min(80, Math.max(25, Math.round(base)));
 }
 
-// ===== SUMMARY =====
-function buildSummary() {
-  const buys=coins.filter(c=>c.signal==='buy').length, sells=coins.filter(c=>c.signal==='sell').length, waits=coins.filter(c=>c.signal==='wait').length;
-  const avg=Math.round(coins.reduce((a,c)=>a+c.success,0)/coins.length);
-  document.getElementById('summaryStats').innerHTML=`
-    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${buys}</div><div class="stat-lbl">شراء</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--red-s)">${sells}</div><div class="stat-lbl">بيع</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--yellow)">${waits}</div><div class="stat-lbl">انتظار</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--gold)">${avg}%</div><div class="stat-lbl">متوسط النجاح</div></div>`;
+function updateTicker() {
+  const keys = ['btc','eth','bnb','sol','xrp','avax','doge','ada'];
+  const syms = ['BTC','ETH','BNB','SOL','XRP','AVAX','DOGE','ADA'];
+  keys.forEach((k,i) => {
+    const d = priceData[syms[i]];
+    if (!d) return;
+    const cls = (d.change||0)>=0?'up':'down';
+    for (const sfx of ['','2']) {
+      const pe = document.getElementById('t-'+k+sfx);
+      const ce = document.getElementById('tc-'+k+sfx);
+      if (pe) pe.textContent = fmtPrice(d.price);
+      if (ce) { ce.textContent = fmtChange(d.change); ce.className = 'change '+cls; }
+    }
+  });
 }
 
-// ===== MARKET =====
-function buildMarket() {
-  const r = uRisk==='low'?{mn:0.01,mx:0.03}:uRisk==='high'?{mn:0.07,mx:0.15}:{mn:0.03,mx:0.07};
-  document.getElementById('marketGrid').innerHTML = coins.map(c=>{
-    const sc=c.signal==='buy'?'buy':c.signal==='sell'?'sell':'wait';
-    const st=c.signal==='buy'?'🟢 شراء':c.signal==='sell'?'🔴 بيع':'🟡 انتظار';
-    const pts=genPts(c.change); const clr=c.change>=0?'#00C851':'#FF3B30';
-    const iMin=uCapital>0?`$${(uCapital*r.mn).toFixed(0)}`:'--';
-    const iMax=uCapital>0?`$${(uCapital*r.mx).toFixed(0)}`:'--';
-    const rc=c.rsi<30?'#00C851':c.rsi>70?'#FF3B30':'#F5F0E8';
-    const mc=c.macd>=0?'#00C851':'#FF3B30';
-    return `<div class="m-card" onclick="showDetail('${c.id}')">
-      <div class="coin-h"><div class="coin-i"><div class="ci ${c.cls}">${c.id}</div><div><div class="cn">${c.id}</div><div class="cp">${c.name}</div></div></div><div class="sig ${sc}">${st}</div></div>
-      <div class="m-price">$${c.price.toLocaleString()}</div>
-      <div class="m-change ${c.change>=0?'up':'down'}">${c.change>=0?'▲':'▼'}${Math.abs(c.change)}%</div>
-      <div class="mini-chart"><svg viewBox="0 0 200 40" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${clr}" stroke-width="1.5"/><polyline points="${pts} 200,40 0,40" fill="${clr}" fill-opacity="0.08" stroke="none"/></svg></div>
-      <div class="inds">
-        <div class="ind"><div class="ind-l">RSI</div><div class="ind-v" style="color:${rc}">${c.rsi}</div></div>
-        <div class="ind"><div class="ind-l">MACD</div><div class="ind-v" style="color:${mc}">${c.macd>0?'+':''}${c.macd}</div></div>
-        <div class="ind"><div class="ind-l">نجاح</div><div class="ind-v" style="color:var(--gold)">${c.success}%</div></div>
-      </div>
-      <div class="ee-row">
-        <div class="ee entry-b"><div class="ee-l">⬆ دخول</div><div class="ee-v">$${c.entry.toLocaleString()}</div><div style="font-size:8px;color:var(--gray)">${c.time}</div></div>
-        <div class="ee sl-b"><div class="ee-l">🛑 SL</div><div class="ee-v">$${c.sl.toLocaleString()}</div></div>
-      </div>
-      <div class="invest-r"><span class="inv-l">💰 استثمر</span><span class="inv-v">${iMin}—${iMax}</span></div>
-      <div class="rate-row"><span class="r-l">نجاح</span><div class="r-bar"><div class="r-fill" style="width:${c.success}%"></div></div><span class="r-v">${c.success}%</span></div>
-    </div>`;
+function buildMarketCard(sym, data, expanded=false) {
+  const sig = getSignal(sym, data.change);
+  const rsi = getRSI(data.change);
+  const sigLabel = sig==='buy'?'شراء':sig==='sell'?'بيع':'انتظار';
+  const changeUp = (data.change||0)>=0;
+  const entry = data.price;
+  const target = sig==='buy' ? (entry*(1+0.04)).toFixed(2) : (entry*(1-0.04)).toFixed(2);
+  const sl = sig==='buy' ? (entry*(1-0.025)).toFixed(2) : (entry*(1+0.025)).toFixed(2);
+  const segs = [1,2,3,4,5].map(i => {
+    const level = sig==='buy'?Math.round(rsi/20):sig==='sell'?Math.round((100-rsi)/20):3;
+    const cls = i<=level ? (sig==='buy'?'active-green':sig==='sell'?'active-red':'active-gold') : '';
+    return `<div class="signal-seg ${cls}"></div>`;
   }).join('');
-}
-
-function genPts(change) {
-  let pts=[],y=20;
-  for(let x=0;x<=200;x+=20){y+=(Math.random()-(change<0?0.6:0.4))*7;y=Math.max(3,Math.min(37,y));pts.push(`${x},${y}`);}
-  return pts.join(' ');
-}
-
-// ===== DETAIL =====
-function showDetail(id) {
-  const c=coins.find(x=>x.id===id); if(!c) return;
-  const sc=c.signal==='buy'?'buy':c.signal==='sell'?'sell':'wait';
-  const st=c.signal==='buy'?'🟢 شراء':c.signal==='sell'?'🔴 بيع':'🟡 انتظار';
-  const r=uRisk==='low'?{mn:0.01,mx:0.03}:uRisk==='high'?{mn:0.07,mx:0.15}:{mn:0.03,mx:0.07};
-  const iMin=uCapital>0?`$${(uCapital*r.mn).toFixed(0)}`:'حدد رأس مالك';
-  const iMax=uCapital>0?`$${(uCapital*r.mx).toFixed(0)}`:'أولاً';
-  const profit=c.signal==='buy'?((c.tp-c.entry)/c.entry*100).toFixed(2):((c.entry-c.tp)/c.entry*100).toFixed(2);
-  const loss=Math.abs((c.sl-c.entry)/c.entry*100).toFixed(2);
-  const rr=(profit/loss).toFixed(1);
-  document.getElementById('modalContent').innerHTML=`
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <div style="display:flex;align-items:center;gap:12px"><div class="ci ${c.cls}" style="width:48px;height:48px;font-size:13px">${c.id}</div><div><div style="font-size:20px;font-weight:700">${c.id}/USDT</div><div style="color:var(--gray);font-size:12px">${c.name}</div></div></div>
-      <div style="text-align:left"><div style="font-family:'Orbitron',monospace;font-size:24px;font-weight:700;color:var(--gold)">$${c.price.toLocaleString()}</div><div class="sig ${sc}" style="display:inline-block;margin-top:5px">${st}</div></div>
+  return `
+  <div class="market-card ${expanded?'expanded':''}" onclick="this.classList.toggle('expanded')" data-signal="${sig}">
+    <div class="mc-header">
+      <span class="mc-name">${sym}/USD</span>
+      <span class="mc-badge ${sig}">${sigLabel}</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px">
-      <div style="background:var(--black-4);border-radius:7px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--gray);letter-spacing:2px;margin-bottom:5px">RSI</div><div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:${c.rsi<30?'#00C851':c.rsi>70?'#FF3B30':'#F5F0E8'}">${c.rsi}</div></div>
-      <div style="background:var(--black-4);border-radius:7px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--gray);letter-spacing:2px;margin-bottom:5px">نجاح</div><div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--gold)">${c.success}%</div></div>
-      <div style="background:var(--black-4);border-radius:7px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--gray);letter-spacing:2px;margin-bottom:5px">R:R</div><div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:${rr>=2?'#00C851':'#FFD600'}">${rr}:1</div></div>
+    <div class="mc-price" style="color:${changeUp?'var(--green)':'var(--red-price)'}">${fmtPrice(data.price)}</div>
+    <div class="mc-change" style="color:${changeUp?'var(--green)':'var(--red-price)'}">${fmtChange(data.change)} (24h)</div>
+    <div class="mc-indicators">
+      <span class="indicator-pill">RSI: ${rsi}</span>
+      <span class="indicator-pill">MACD: ${(data.change||0)>0?'صاعد':'هابط'}</span>
+      <span class="indicator-pill">${data.name}</span>
     </div>
-    <div style="background:var(--black-4);border-radius:9px;padding:16px;margin-bottom:14px">
-      <div style="font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">خطة الصفقة</div>
-      <div class="plan-row"><span class="plan-l">💰 دخول</span><span class="plan-v" style="color:var(--gold)">$${c.entry.toLocaleString()}</span></div>
-      <div class="plan-row"><span class="plan-l">🎯 Take Profit</span><span class="plan-v" style="color:var(--green)">$${c.tp.toLocaleString()} (+${profit}%)</span></div>
-      <div class="plan-row"><span class="plan-l">🛑 Stop Loss</span><span class="plan-v" style="color:var(--red-s)">$${c.sl.toLocaleString()} (-${loss}%)</span></div>
-      <div class="plan-row"><span class="plan-l">⏰ المدة</span><span class="plan-v">${c.time}</span></div>
-      <div class="plan-row"><span class="plan-l">💵 استثمر</span><span class="plan-v" style="color:var(--gold)">${iMin}—${iMax}</span></div>
+    <div class="signal-bar">${segs}<span style="font-size:11px;color:var(--text2);margin-right:6px">قوة الإشارة</span></div>
+    <div class="mc-details">
+      <div class="mc-row"><span>نقطة الدخول</span><span style="color:var(--gold)">${fmtPrice(parseFloat(entry))}</span></div>
+      <div class="mc-row"><span>الهدف (TP)</span><span style="color:var(--green)">${fmtPrice(parseFloat(target))}</span></div>
+      <div class="mc-row"><span>وقف الخسارة</span><span style="color:var(--red-price)">${fmtPrice(parseFloat(sl))}</span></div>
+      <div class="mc-row"><span>نسبة النجاح</span><span style="color:var(--gold)">${55+Math.round(Math.abs(data.change||0)*2)}%</span></div>
+      <div class="mc-row"><span>المدة المتوقعة</span><span>4 - 24 ساعة</span></div>
     </div>
-    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);border-radius:7px;padding:12px;font-size:11px;color:var(--gray);text-align:center;margin-bottom:14px">⚠️ تحليل تقني فقط وليس نصيحة مالية</div>
-    <div style="display:flex;gap:9px">
-      <button class="btn-pri" style="flex:1" onclick="recordTrade('${c.id}',${c.entry},'${c.signal}')">✅ سجّل الصفقة</button>
-      <button class="btn-sec" onclick="closeModal()">إغلاق</button>
-    </div>`;
-  document.getElementById('modal').classList.add('active');
+  </div>`;
 }
 
-function closeModal() { document.getElementById('modal').classList.remove('active'); }
-
-// ===== PORTFOLIO =====
-function buildPortfolio() {
-  const wins=trades.filter(t=>t.pnl>0).length, losses=trades.filter(t=>t.pnl<0).length;
-  const totalPnl=trades.reduce((a,t)=>a+t.pnl,0);
-  const rate=trades.length>0?Math.round(wins/trades.length*100):0;
-  document.getElementById('balanceDisplay').textContent=`$${(uCapital+totalPnl).toLocaleString()}`;
-  document.getElementById('balanceSub').innerHTML=`<span style="color:${totalPnl>=0?'var(--green)':'var(--red-s)'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(2)}</span>`;
-  document.getElementById('pWins').textContent=wins;
-  document.getElementById('pLoss').textContent=losses;
-  document.getElementById('pRate').textContent=rate+'%';
-  document.getElementById('pTotal').textContent=trades.length;
-  setTimeout(()=>{
-    const ctx=document.getElementById('portfolioChart');
-    if(ctx&&!ctx._c){ctx._c=new Chart(ctx,{type:'line',data:{labels:['أسبوع 1','أسبوع 2','أسبوع 3','أسبوع 4'],datasets:[{label:'المحفظة',data:[uCapital||1000,(uCapital||1000)*1.04,(uCapital||1000)*1.08,(uCapital||1000)*(1+totalPnl/(uCapital||1000)||1.13)],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.07)',fill:true,tension:0.4,pointBackgroundColor:'#C9A84C'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}}}}})}},100);
+function updateMarketCards() {
+  const qm = document.getElementById('quickMarket');
+  const fm = document.getElementById('fullMarket');
+  let qHTML = '', fHTML = '';
+  Object.entries(priceData).forEach(([sym, data]) => {
+    const card = buildMarketCard(sym, data);
+    qHTML += card;
+    fHTML += card;
+  });
+  if (qm) qm.innerHTML = qHTML;
+  if (fm) fm.innerHTML = fHTML;
+  document.getElementById('marketLoader')?.remove();
 }
 
-// ===== TRADES =====
-function buildTrades() {
-  const defaultTrades=[
-    {coin:'BTC',type:'شراء',entry:86500,amount:500,pnl:47.5,date:'2026-03-22'},
-    {coin:'ETH',type:'شراء',entry:2210,amount:300,pnl:-18,date:'2026-03-21'},
-    {coin:'SOL',type:'شراء',entry:128,amount:200,pnl:32,date:'2026-03-21'}
+function filterMarket(type) {
+  document.querySelectorAll('#fullMarket .market-card').forEach(c => {
+    if (type==='all') c.style.display='';
+    else c.style.display = c.dataset.signal===type ? '' : 'none';
+  });
+}
+
+// ============ SIGNALS ============
+function buildSignals() {
+  const list = document.getElementById('signalsList');
+  if (!list) return;
+  const signals = [
+    {sym:'BTC',type:'buy',entry:67200,tp:71500,sl:65800,prob:72,reason:'كسر مستوى مقاومة قوي مع حجم تداول مرتفع وإشارة RSI إيجابية'},
+    {sym:'ETH',type:'sell',entry:3480,tp:3200,sl:3550,prob:65,reason:'تشكّل نمط هبوطي على المخطط اليومي مع ضعف في حجم التداول'},
+    {sym:'SOL',type:'buy',entry:162,tp:178,sl:155,prob:68,reason:'ارتداد من خط دعم قوي مع إشارات MACD إيجابية وزخم صاعد'},
   ];
-  const allTrades=[...defaultTrades,...trades];
-  document.getElementById('tradesBody').innerHTML=allTrades.map(t=>`
-    <tr><td>${t.coin}</td><td>${t.type}</td><td style="font-family:'Orbitron',monospace">$${t.entry.toLocaleString()}</td><td style="font-family:'Orbitron',monospace">$${t.amount}</td><td class="${t.pnl>=0?'profit':'loss'}" style="font-family:'Orbitron',monospace">${t.pnl>=0?'+':''}$${t.pnl.toFixed(2)}</td><td style="color:var(--gray)">${t.date}</td></tr>`).join('');
+  list.innerHTML = signals.map(s => `
+  <div class="card" style="margin-bottom:14px;border-color:${s.type==='buy'?'rgba(0,200,83,0.3)':s.type==='sell'?'rgba(255,61,61,0.3)':'rgba(255,215,0,0.3)'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div>
+        <div style="font-size:20px;font-weight:700;color:var(--gold)">${s.sym}/USD</div>
+        <span class="mc-badge ${s.type}" style="margin-top:6px;display:inline-block">${s.type==='buy'?'🟢 شراء':s.type==='sell'?'🔴 بيع':'🟡 انتظار'}</span>
+      </div>
+      <div style="text-align:left">
+        <div style="font-size:24px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif">${s.prob}%</div>
+        <div style="font-size:11px;color:var(--text2)">نسبة النجاح</div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-bottom:12px">
+      <div style="text-align:center;padding:10px;background:var(--bg4);border-radius:8px">
+        <div style="font-size:11px;color:var(--text2)">دخول</div>
+        <div style="font-weight:700;font-family:'Rajdhani',sans-serif">$${s.entry.toLocaleString()}</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:rgba(0,200,83,0.08);border-radius:8px">
+        <div style="font-size:11px;color:var(--green)">هدف TP</div>
+        <div style="font-weight:700;font-family:'Rajdhani',sans-serif;color:var(--green)">$${s.tp.toLocaleString()}</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:rgba(255,61,61,0.08);border-radius:8px">
+        <div style="font-size:11px;color:var(--red-price)">وقف SL</div>
+        <div style="font-weight:700;font-family:'Rajdhani',sans-serif;color:var(--red-price)">$${s.sl.toLocaleString()}</div>
+      </div>
+    </div>
+    <div class="info-box"><strong>📊 السبب:</strong> ${s.reason}</div>
+  </div>`).join('');
 }
 
-function addTrade() {
-  const cs=['BTC','ETH','SOL','BNB'];
-  const coin=cs[Math.floor(Math.random()*cs.length)];
-  const pnl=parseFloat((Math.random()*80-30).toFixed(2));
-  trades.push({coin,type:'شراء',entry:Math.floor(Math.random()*50000+1000),amount:200,pnl,date:'2026-03-22'});
-  uPoints+=10; buildTrades();
-  showNotif('✅ صفقة مسجلة!',`${coin} — ${pnl>=0?'+':''}$${pnl} | +10 نقاط`);
-  saveUserData();
-}
-
-function recordTrade(coin,entry,signal) {
-  const pnl=parseFloat((Math.random()*50-15).toFixed(2));
-  trades.push({coin,type:signal==='buy'?'شراء':'بيع',entry,amount:uCapital>0?(uCapital*0.05).toFixed(0):100,pnl,date:'2026-03-22'});
-  uPoints+=10; closeModal();
-  showNotif('✅ صفقة مسجلة!',`${coin} @ $${entry.toLocaleString()}`);
-  saveUserData();
-}
-
-// ===== AI =====
-const aiR={
-  'BTC':'Bitcoin عند مستوى دعم قوي. RSI=58 يشير لزخم صاعد. دخول عند $87,200 مع SL عند $84,800 وهدف $91,500. نسبة النجاح 73%.',
-  'ETH':'Ethereum في منطقة حيادية. MACD سلبي — انتظر كسر مقاومة $2,250 قبل الدخول.',
-  'SOL':'Solana ممتازة! RSI=31 في ذروة البيع — إشارة شراء قوية جداً. دخول عند $131.',
-  'RSI':'RSI (Relative Strength Index) مؤشر قوة نسبية من 0-100. تحت 30 = ذروة بيع (فرصة شراء). فوق 70 = ذروة شراء (فرصة بيع).',
-  'Stop Loss':'Stop Loss هو وقف الخسارة — سعر محدد تُغلق فيه الصفقة تلقائياً لحماية رأس مالك من خسائر أكبر.',
-  'default':'بناءً على التحليل الحالي، BTC وSOL يُظهران إشارات شراء قوية. تذكر دائماً إدارة المخاطر وعدم المخاطرة بأكثر من 3-7% في صفقة واحدة.'
+// ============ AI CHAT ============
+const aiResponses = {
+  'btc':'Bitcoin حالياً يتداول عند مستويات مهمة. بناءً على مؤشرات RSI وMACD، هناك فرصة شراء عند الدعم الحالي. استثمر بحذر بـ 2-3% من رأس مالك.',
+  'eth':'Ethereum يظهر ضعفاً نسبياً مقارنة بالسوق. ينصح بالانتظار لتأكيد اتجاه واضح قبل الدخول.',
+  'rsi':'RSI هو مؤشر يقيس سرعة تحركات السعر بين 0 و100. قيمة أقل من 30 = ذروة بيع (فرصة شراء)، وأكثر من 70 = ذروة شراء (تحذير).',
+  'macd':'MACD يقيس الزخم. عندما يتقاطع الخط السريع فوق البطيء = إشارة شراء. والعكس إشارة بيع.',
+  'مخاطر':'لا تخاطر بأكثر من 2% من رأس مالك في صفقة واحدة. ضع دائماً Stop Loss قبل الدخول.',
+  'default':'سؤال ممتاز! 🎯 بناءً على تحليل السوق الحالي، أنصحك بالتركيز على العملات الكبيرة (BTC, ETH) مع إدارة مخاطر صارمة. هل تريد تفاصيل أكثر؟'
 };
 
 function sendChat() {
-  const inp=document.getElementById('chatIn');
-  const msg=inp.value.trim(); if(!msg) return;
-  const wrap=document.getElementById('chatWrap');
-  wrap.innerHTML+=`<div class="chat-msg user">${msg}</div>`;
-  inp.value=''; wrap.scrollTop=wrap.scrollHeight;
-  setTimeout(()=>{
-    let r=aiR.default;
-    for(const k of Object.keys(aiR)){if(msg.includes(k)){r=aiR[k];break;}}
-    wrap.innerHTML+=`<div class="chat-msg ai"><div class="ai-lbl">🤖 EAM AI</div>${r}<br><br><small style="color:var(--gray)">⚠️ معلومات تحليلية فقط</small></div>`;
-    wrap.scrollTop=wrap.scrollHeight; uPoints+=3;
-  },700);
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const chat = document.getElementById('chatMessages');
+  chat.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    const lower = msg.toLowerCase();
+    let resp = aiResponses.default;
+    for (const [key, val] of Object.entries(aiResponses)) {
+      if (lower.includes(key)) { resp = val; break; }
+    }
+    chat.innerHTML += `<div class="chat-msg bot">${resp}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 800);
 }
 
-function ask(q){document.getElementById('chatIn').value=q;sendChat();}
+// ============ CALCULATOR ============
+function calcTrade() {
+  const entry = parseFloat(document.getElementById('c_entry').value);
+  const tp = parseFloat(document.getElementById('c_tp').value);
+  const sl = parseFloat(document.getElementById('c_sl').value);
+  const capital = parseFloat(document.getElementById('c_capital').value);
+  const risk = parseFloat(document.getElementById('c_risk').value) / 100;
+  if (!entry||!tp||!sl||!capital) return;
+  const maxLoss = capital * risk;
+  const priceSL = Math.abs(entry - sl);
+  const size = maxLoss / priceSL;
+  const potProfit = Math.abs(tp - entry) * size;
+  const rr = potProfit / maxLoss;
+  const type = tp > entry ? 'شراء 📈' : 'بيع 📉';
+  document.getElementById('calcResult').innerHTML = `
+    <div class="info-box">
+      <div class="bt-stat"><span>نوع الصفقة</span><span style="color:var(--gold)">${type}</span></div>
+      <div class="bt-stat"><span>حجم الصفقة</span><span style="color:var(--gold)">${size.toFixed(4)}</span></div>
+      <div class="bt-stat"><span>أقصى خسارة مسموح</span><span style="color:var(--red-price)">$${maxLoss.toFixed(2)}</span></div>
+      <div class="bt-stat"><span>الربح المتوقع</span><span style="color:var(--green)">$${potProfit.toFixed(2)}</span></div>
+      <div class="bt-stat"><span>نسبة R:R</span><span style="color:${rr>=2?'var(--green)':'var(--red-price)'}">1 : ${rr.toFixed(2)}</span></div>
+      <div class="bt-stat"><span>توصية</span><span style="color:${rr>=2?'var(--green)':'var(--red-price)'}">${rr>=2?'✅ صفقة جيدة!':'⚠️ R:R منخفض'}</span></div>
+    </div>`;
+}
 
-// ===== NEWS =====
-const newsData=[
-  {title:'Bitcoin يختبر $88,000 وسط توقعات إيجابية',sentiment:'pos',time:'30 دقيقة',impact:'high',src:'CoinDesk'},
-  {title:'الاحتياطي الفيدرالي يُبقي على أسعار الفائدة دون تغيير',sentiment:'neu',time:'ساعة',impact:'high',src:'Reuters'},
-  {title:'Ethereum يستعد لترقية كبيرة الشهر القادم',sentiment:'pos',time:'2 ساعة',impact:'medium',src:'The Block'},
-  {title:'تراجع حجم التداول في السوق بنسبة 15%',sentiment:'neg',time:'3 ساعات',impact:'medium',src:'CoinTelegraph'},
-  {title:'Solana تسجل رقماً قياسياً في المعاملات اليومية',sentiment:'pos',time:'4 ساعات',impact:'low',src:'Decrypt'}
-];
+// ============ RISK ============
+function selectRisk(el, type) {
+  document.querySelectorAll('.risk-option').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  const pcts = {low:'1-3',medium:'3-7',high:'7-15'};
+  document.getElementById('riskPct').value = type==='low'?2:type==='medium'?5:10;
+}
 
-function buildNews() {
-  const imp={high:'⚠️ تأثير عالي',medium:'📊 تأثير متوسط',low:'ℹ️ منخفض'};
-  document.getElementById('newsContainer').innerHTML=`<div style="padding:16px 18px 0;font-size:13px;font-weight:700">📰 آخر الأخبار</div>`+newsData.map(n=>`
-    <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer" onmouseover="this.style.background='rgba(201,168,76,0.03)'" onmouseout="this.style.background=''">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">
-        <div style="font-size:13px;font-weight:600;line-height:1.5">${n.title}</div>
-        <div class="sig ${n.sentiment==='pos'?'buy':n.sentiment==='neg'?'sell':'wait'}" style="white-space:nowrap">${n.sentiment==='pos'?'إيجابي':n.sentiment==='neg'?'سلبي':'محايد'}</div>
+function calcRisk() {
+  const capital = parseFloat(document.getElementById('riskCapital').value);
+  const pct = parseFloat(document.getElementById('riskPct').value);
+  const maxLoss = capital * pct / 100;
+  const from = capital * (pct/100) * 10;
+  const to = capital * (pct/100) * 25;
+  document.getElementById('maxLoss').textContent = '$'+maxLoss.toFixed(0);
+  document.getElementById('investFrom').textContent = '$'+from.toFixed(0);
+  document.getElementById('investTo').textContent = '$'+to.toFixed(0);
+  document.getElementById('riskResult').style.display = 'block';
+}
+
+// ============ BACKTEST ============
+function runBacktest() {
+  const btn = event.target;
+  btn.innerHTML = '<span class="loading"></span> جاري الاختبار...';
+  btn.disabled = true;
+  setTimeout(() => {
+    const trades = 30 + Math.floor(Math.random()*20);
+    const wr = 55 + Math.floor(Math.random()*20);
+    const wins = Math.round(trades*wr/100);
+    const losses = trades - wins;
+    const roi = (8 + Math.random()*25).toFixed(1);
+    const profit = (parseFloat(document.getElementById('bt_capital').value)*parseFloat(roi)/100).toFixed(0);
+    document.getElementById('bt_trades').textContent = trades;
+    document.getElementById('bt_wins').textContent = wins + ' صفقة';
+    document.getElementById('bt_losses').textContent = losses + ' صفقة';
+    document.getElementById('bt_winrate').textContent = wr + '%';
+    document.getElementById('bt_profit').textContent = '+$' + profit;
+    document.getElementById('bt_drawdown').textContent = '-'+((3+Math.random()*5).toFixed(1))+'%';
+    document.getElementById('bt_roi').textContent = '+'+roi+'%';
+    document.getElementById('btResult').classList.add('show');
+    btn.innerHTML = '▶ تشغيل الاختبار';
+    btn.disabled = false;
+    showToast('✅','اكتمل الاختبار','نسبة نجاح '+wr+'% خلال الفترة المختارة');
+  }, 2000);
+}
+
+// ============ COURSE ============
+function toggleChapter(card) {
+  if (event.target.closest('.lesson-item')) return;
+  card.classList.toggle('open');
+}
+
+const lessonContent = {
+  'lesson-1-1': {
+    title: 'ما هو التداول وما هي البورصة؟',
+    content: `
+    <div class="lesson-content-block">
+      <h4>📌 ما هو التداول؟</h4>
+      <p>التداول هو عملية شراء وبيع الأصول المالية (كالأسهم والعملات والكريبتو) بهدف تحقيق الربح من فرق السعر.</p>
+      <div class="info-box">💡 <strong>مثال بسيط:</strong> اشتريت Bitcoin بسعر $60,000 وبعتها بسعر $65,000 — ربحت $5,000!</div>
+    </div>
+    <div class="lesson-content-block">
+      <h4>🏛️ ما هي البورصة؟</h4>
+      <p>البورصة هي السوق المنظم الذي يجمع البائعين والمشترين. مثل السوق التقليدي لكن رقمي وعالمي.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><h5>بورصة الأسهم</h5><p>مثل NYSE و NASDAQ — لشراء حصص في الشركات</p></div>
+        <div class="concept-card"><h5>بورصة الكريبتو</h5><p>مثل Binance و Coinbase — للعملات الرقمية</p></div>
+        <div class="concept-card"><h5>سوق الفوركس</h5><p>تداول العملات الرسمية مثل USD/EUR</p></div>
+        <div class="concept-card"><h5>سوق السلع</h5><p>تداول الذهب والنفط والمواد الخام</p></div>
       </div>
-      <div style="font-size:10px;color:var(--gray)">${n.src} • منذ ${n.time}</div>
-      <div style="font-size:10px;color:${n.impact==='high'?'var(--red-s)':n.impact==='medium'?'var(--yellow)':'var(--green)'};margin-top:3px">${imp[n.impact]}</div>
-    </div>`).join('');
+    </div>
+    <div class="lesson-content-block">
+      <h4>❓ اختبر نفسك</h4>
+      <div class="quiz-question">
+        <h5>ما هو الهدف الأساسي من التداول؟</h5>
+        <div class="quiz-option" onclick="answerQuiz(this, false)">⭕ الاحتفاظ بالأصول للأبد</div>
+        <div class="quiz-option" onclick="answerQuiz(this, true)">⭕ الشراء بسعر منخفض والبيع بسعر أعلى</div>
+        <div class="quiz-option" onclick="answerQuiz(this, false)">⭕ إنفاق الأموال في الأسواق</div>
+      </div>
+    </div>`
+  },
+  'lesson-2-1': {
+    title: 'مؤشر RSI — كيف تستخدمه؟',
+    content: `
+    <div class="lesson-content-block">
+      <h4>📊 ما هو مؤشر RSI؟</h4>
+      <p>RSI (Relative Strength Index) هو مؤشر زخم يقيس سرعة وقوة تحركات السعر. يتراوح بين 0 و 100.</p>
+      <div class="concept-grid">
+        <div class="concept-card" style="border-color:rgba(255,61,61,0.3)"><h5 style="color:var(--red-price)">RSI > 70</h5><p>ذروة شراء — السعر مرتفع جداً وقد يهبط قريباً</p></div>
+        <div class="concept-card" style="border-color:rgba(0,200,83,0.3)"><h5 style="color:var(--green)">RSI < 30</h5><p>ذروة بيع — السعر منخفض جداً وقد يرتفع قريباً</p></div>
+        <div class="concept-card"><h5>RSI = 50</h5><p>منطقة محايدة — لا إشارة واضحة</p></div>
+        <div class="concept-card" style="border-color:rgba(255,215,0,0.3)"><h5 style="color:var(--gold)">40-60</h5><p>المنطقة الطبيعية للتداول العادي</p></div>
+      </div>
+    </div>
+    <div class="lesson-content-block">
+      <h4>💡 كيف تستخدمه في التداول؟</h4>
+      <div class="tip-box">✅ <strong>إشارة شراء:</strong> عندما يتجاوز RSI مستوى 30 صعوداً</div>
+      <div class="warning-box">⚠️ <strong>إشارة بيع:</strong> عندما ينزل RSI تحت 70 هبوطاً</div>
+      <div class="info-box">📌 <strong>نصيحة:</strong> لا تستخدم RSI وحده! ادمجه مع مؤشرات أخرى لتأكيد الإشارة.</div>
+    </div>
+    <div class="lesson-content-block">
+      <h4>❓ اختبر نفسك</h4>
+      <div class="quiz-question">
+        <h5>إذا كان RSI = 25، ماذا يعني ذلك؟</h5>
+        <div class="quiz-option" onclick="answerQuiz(this, true)">⭕ السهم في ذروة بيع — فرصة شراء محتملة</div>
+        <div class="quiz-option" onclick="answerQuiz(this, false)">⭕ السهم في ذروة شراء — يجب البيع</div>
+        <div class="quiz-option" onclick="answerQuiz(this, false)">⭕ لا يوجد أي إشارة</div>
+      </div>
+    </div>`
+  },
+  'lesson-3-1': {
+    title: 'ما هي إدارة المخاطر ولماذا هي ضرورية؟',
+    content: `
+    <div class="lesson-content-block">
+      <h4>⚖️ لماذا إدارة المخاطر هي الأهم؟</h4>
+      <p>يخسر 90% من المبتدئين أموالهم ليس لأنهم لا يعرفون التحليل، بل لأنهم لا يديرون مخاطرهم!</p>
+      <div class="warning-box">⚠️ <strong>حقيقة:</strong> متداول نسبة نجاحه 40% فقط يمكنه أن يربح إذا كانت أرباحه أكبر من خسائره بثلاثة أضعاف.</div>
+    </div>
+    <div class="lesson-content-block">
+      <h4>📏 القاعدة الذهبية — 2%</h4>
+      <div class="info-box">💡 لا تخاطر بأكثر من <strong>2% من رأس مالك</strong> في صفقة واحدة. إذا كان رأس مالك $10,000 — أقصى خسارة في صفقة = $200</div>
+      <div class="concept-grid">
+        <div class="concept-card" style="border-color:rgba(0,200,83,0.3)">
+          <h5 style="color:var(--green)">✅ مع إدارة المخاطر</h5>
+          <p>10 صفقات خاسرة متتالية = خسارة 18% فقط من رأس المال</p>
+        </div>
+        <div class="concept-card" style="border-color:rgba(255,61,61,0.3)">
+          <h5 style="color:var(--red-price)">❌ بدون إدارة مخاطر</h5>
+          <p>3 صفقات خاسرة متتالية قد تمحو 50-90% من رأس مالك</p>
+        </div>
+      </div>
+    </div>`
+  }
+};
+
+function openLesson(id, e) {
+  e.stopPropagation();
+  const l = lessonContent[id];
+  if (!l) {
+    showToast('📖','درس قادماً','هذا الدرس سيكون متاحاً قريباً');
+    return;
+  }
+  document.getElementById('lessonTitle').textContent = l.title;
+  document.getElementById('lessonBody').innerHTML = l.content;
+  document.getElementById('lessonModal').classList.add('open');
 }
 
-function buildNewsChart() {
-  setTimeout(()=>{
-    const ctx=document.getElementById('newsChart');
-    if(ctx&&!ctx._c){ctx._c=new Chart(ctx,{type:'doughnut',data:{labels:['إيجابي','محايد','سلبي'],datasets:[{data:[3,1,1],backgroundColor:['rgba(0,200,81,0.7)','rgba(255,214,0,0.7)','rgba(255,59,48,0.7)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:11}}}}}})}},100);
+function closeLesson() { document.getElementById('lessonModal').classList.remove('open'); }
+
+function answerQuiz(el, correct) {
+  const opts = el.parentElement.querySelectorAll('.quiz-option');
+  opts.forEach(o=>o.style.pointerEvents='none');
+  el.classList.add(correct?'correct':'wrong');
+  if (correct) showToast('🎉','إجابة صحيحة!','أحسنت! +10 نقاط');
+  else { showToast('❌','إجابة خاطئة','حاول مرة أخرى في الدرس القادم'); }
 }
 
-// ===== CALENDAR =====
-const calData=[
-  {time:'09:00',event:'مؤشر PMI الصناعي — أمريكا',country:'🇺🇸',impact:'high'},
-  {time:'11:30',event:'بيانات التجزئة — أوروبا',country:'🇪🇺',impact:'medium'},
-  {time:'14:00',event:'خطاب مسؤول الفيدرالي',country:'🇺🇸',impact:'high'},
-  {time:'16:00',event:'مخزونات النفط',country:'🇺🇸',impact:'medium'},
-  {time:'20:00',event:'بيانات التضخم — اليابان',country:'🇯🇵',impact:'low'}
-];
-
-function buildCalendar() {
-  document.getElementById('calContainer').innerHTML=`<div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700">اليوم — 22 مارس 2026</span><div style="font-size:10px;display:flex;gap:10px;align-items:center"><span><span style="color:var(--red-s)">●</span> عالي</span><span><span style="color:var(--yellow)">●</span> متوسط</span><span><span style="color:var(--green)">●</span> منخفض</span></div></div>`+calData.map(e=>`
-    <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,0.04)">
-      <span style="font-family:'Orbitron',monospace;font-size:11px;color:var(--gold);min-width:60px">${e.time}</span>
-      <span style="width:7px;height:7px;border-radius:50%;background:${e.impact==='high'?'var(--red-s)':e.impact==='medium'?'var(--yellow)':'var(--green)'};min-width:7px"></span>
-      <div style="flex:1"><div style="font-size:12px">${e.event}</div><div style="font-size:10px;color:var(--gray)">${e.country}</div></div>
-    </div>`).join('');
-}
-
-// ===== BACKTESTING =====
-function runBT() {
-  const cap=parseFloat(document.getElementById('btCap').value)||1000;
-  const res={trades:Math.floor(Math.random()*25+10),wins:0,returnPct:(Math.random()*35+8).toFixed(1)};
-  res.wins=Math.floor(res.trades*0.65); res.losses=res.trades-res.wins;
-  res.final=(cap*(1+res.returnPct/100)).toFixed(2);
-  const el=document.getElementById('btResult'); el.style.display='block';
-  el.innerHTML=`<div style="background:var(--black-4);border-radius:9px;padding:16px">
-    <div style="font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">نتائج الاختبار</div>
-    <div class="calc-row"><span>رأس المال النهائي</span><span class="calc-val" style="color:var(--green)">$${res.final}</span></div>
-    <div class="calc-row"><span>العائد</span><span class="calc-val" style="color:var(--green)">+${res.returnPct}%</span></div>
-    <div class="calc-row"><span>الصفقات</span><span class="calc-val">${res.trades}</span></div>
-    <div class="calc-row"><span>رابح/خاسر</span><span class="calc-val">${res.wins}/${res.losses}</span></div>
-  </div>`;
-}
-
-function buildBTChart() {
-  setTimeout(()=>{
-    const ctx=document.getElementById('btChart');
-    if(ctx&&!ctx._c){const ls=Array.from({length:10},(_,i)=>i+1);ctx._c=new Chart(ctx,{type:'line',data:{labels:ls,datasets:[{label:'RSI Strategy',data:ls.map(i=>1000*(1+i*0.04+Math.random()*0.02)),borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.05)',fill:true,tension:0.4},{label:'MA Crossover',data:ls.map(i=>1000*(1+i*0.025+Math.random()*0.015)),borderColor:'#627EEA',backgroundColor:'rgba(98,126,234,0.05)',fill:true,tension:0.4}]},options:{responsive:true,plugins:{legend:{labels:{color:'#888'}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}}}}})}},100);
-}
-
-// ===== RISK =====
-function selRisk(el,level) {
-  document.querySelectorAll('.risk-card').forEach(c=>{c.classList.remove('sel');});
-  el.classList.add('sel'); uRisk=level; buildRiskCalc(); buildMarket();
-}
-
-function buildRiskCalc() {
-  const r=uRisk==='low'?[1,3]:uRisk==='high'?[7,15]:[3,7];
-  const cap=uCapital||1000;
-  document.getElementById('riskCalc').innerHTML=`<div class="calc-res">
-    <div class="calc-row"><span>أدنى استثمار</span><span class="calc-val">$${(cap*r[0]/100).toFixed(2)}</span></div>
-    <div class="calc-row"><span>أقصى استثمار</span><span class="calc-val">$${(cap*r[1]/100).toFixed(2)}</span></div>
-    <div class="calc-row"><span>أقصى خسارة</span><span class="calc-val" style="color:var(--red-s)">$${(cap*r[1]/100).toFixed(2)}</span></div>
-    <div class="calc-row"><span>الصفقات الممكنة</span><span class="calc-val">${Math.floor(100/r[1])}</span></div>
-  </div>`;
-}
-
-// ===== CALCULATOR =====
-function calc() {
-  const cap=parseFloat(document.getElementById('cCap').value)||0;
-  const risk=parseFloat(document.getElementById('cRisk').value)||0;
-  const entry=parseFloat(document.getElementById('cEntry').value)||0;
-  const sl=parseFloat(document.getElementById('cSL').value)||0;
-  const tp=parseFloat(document.getElementById('cTP').value)||0;
-  if(!cap||!risk||!entry||!sl||!tp) return;
-  const rAmt=cap*risk/100;
-  const slD=Math.abs(entry-sl); const tpD=Math.abs(tp-entry);
-  const pos=rAmt/slD; const maxInv=pos*entry;
-  const rr=(tpD/slD).toFixed(1);
-  const profit=(pos*tpD).toFixed(2);
-  document.getElementById('calcRes').innerHTML=`<div class="calc-res">
-    <div class="calc-row"><span>حجم الصفقة</span><span class="calc-val">$${maxInv.toFixed(2)}</span></div>
-    <div class="calc-row"><span>الخسارة المحتملة</span><span class="calc-val" style="color:var(--red-s)">-$${rAmt.toFixed(2)}</span></div>
-    <div class="calc-row"><span>الربح المحتمل</span><span class="calc-val" style="color:var(--green)">+$${profit}</span></div>
-    <div class="calc-row"><span>نسبة R:R</span><span class="calc-val" style="color:${rr>=2?'var(--green)':'var(--yellow)'}">${rr}:1 ${rr>=2?'✅':'⚠️'}</span></div>
-  </div>`;
-}
-
-// ===== ALERTS =====
+// ============ ALERTS ============
 function addAlert() {
-  const coin=document.getElementById('aCoin').value;
-  const cond=document.getElementById('aCond').value;
-  const val=document.getElementById('aVal').value;
-  if(!val) return;
-  alerts.push({coin,cond,val,text:`${coin} ${cond==='above'?'يتجاوز':'ينزل عن'} $${val}`});
-  buildAlerts();
-  showNotif('🔔 تنبيه مضاف!',`${coin} ${cond==='above'?'يتجاوز':'ينزل عن'} $${val}`);
+  const coin = document.getElementById('alertCoin').value;
+  const cond = document.getElementById('alertCond').value;
+  const price = document.getElementById('alertPrice').value;
+  if (!price) return;
+  const list = document.getElementById('alertsList');
+  const item = document.createElement('div');
+  item.className = 'alert-item';
+  item.innerHTML = `
+    <span class="alert-icon">🔔</span>
+    <div class="alert-text">
+      <strong>${coin} ${cond} $${parseFloat(price).toLocaleString()}</strong>
+      <span>أضيف الآن</span>
+    </div>
+    <div class="alert-actions">
+      <span class="status-badge open">نشط</span>
+      <button class="btn btn-sm btn-red" onclick="removeAlert(this)">حذف</button>
+    </div>`;
+  list.prepend(item);
+  document.getElementById('alertPrice').value = '';
+  showToast('🔔','تم إضافة التنبيه',`سيتم إشعارك عندما ${coin} ${cond} $${price}`);
 }
 
-function buildAlerts() {
-  const el=document.getElementById('alertsList');
-  if(!el) return;
-  el.innerHTML=alerts.length===0?'<div style="text-align:center;color:var(--gray);padding:24px;font-size:12px">لا توجد تنبيهات</div>':alerts.map((a,i)=>`
-    <div class="alert-item"><div><div style="font-size:13px;font-weight:700">${a.coin}</div><div style="font-size:11px;color:var(--gray)">${a.text}</div></div><button class="a-del" onclick="delAlert(${i})">حذف</button></div>`).join('');
+function removeAlert(btn) {
+  btn.closest('.alert-item').remove();
+  showToast('🗑️','تم الحذف','تم حذف التنبيه');
 }
 
-function delAlert(i){alerts.splice(i,1);buildAlerts();}
-
-// ===== REPORTS =====
-function buildReports() {
-  const wins=trades.filter(t=>t.pnl>0).length, losses=trades.filter(t=>t.pnl<0).length;
-  const totalPnl=trades.reduce((a,t)=>a+t.pnl,0)+61.5;
-  const rate=trades.length>0?Math.round(wins/trades.length*100):72;
-  document.getElementById('reportStats').innerHTML=`
-    <div class="stat-box"><div class="stat-val" style="color:var(--gold)">$${totalPnl.toFixed(2)}</div><div class="stat-lbl">إجمالي الربح</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${wins+3}</div><div class="stat-lbl">رابحة</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--red-s)">${losses+1}</div><div class="stat-lbl">خاسرة</div></div>
-    <div class="stat-box"><div class="stat-val" style="color:var(--gold)">${rate||72}%</div><div class="stat-lbl">نسبة النجاح</div></div>`;
-  setTimeout(()=>{
-    const wc=document.getElementById('weekChart');
-    if(wc&&!wc._c){wc._c=new Chart(wc,{type:'bar',data:{labels:['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة'],datasets:[{label:'ربح',data:[20,45,0,62,30,18],backgroundColor:'rgba(0,200,81,0.6)'},{label:'خسارة',data:[-15,0,-18,0,-8,0],backgroundColor:'rgba(255,59,48,0.6)'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#888'}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#888'}}}}})}
-    const dc=document.getElementById('distChart');
-    if(dc&&!dc._c){dc._c=new Chart(dc,{type:'pie',data:{labels:['BTC','ETH','SOL','BNB'],datasets:[{data:[40,30,20,10],backgroundColor:['rgba(247,147,26,0.7)','rgba(98,126,234,0.7)','rgba(153,69,255,0.7)','rgba(243,186,47,0.7)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#888'}}}}})}
-  },100);
-}
-
-// ===== POINTS =====
-function buildPoints() {
-  document.getElementById('userPts').textContent=uPoints;
-  const badges=[
-    {e:'🥇',n:'أول صفقة',d:'سجّل أول صفقة',earned:trades.length>0},
-    {e:'🔥',n:'نشط',d:'10 صفقات',earned:trades.length>=10},
-    {e:'💎',n:'محترف',d:'50 صفقة',earned:false},
-    {e:'🎯',n:'دقيق',d:'نجاح 70%+',earned:false},
-    {e:'👥',n:'داعي',d:'3 أصدقاء',earned:false},
-    {e:'📅',n:'منتظم',d:'7 أيام',earned:false},
-    {e:'🤖',n:'محب AI',d:'100 سؤال',earned:false},
-    {e:'👑',n:'VIP',d:'500 نقطة',earned:uPoints>=500}
-  ];
-  document.getElementById('badges').innerHTML=badges.map(b=>`
-    <div style="background:var(--black-4);border-radius:9px;padding:14px;text-align:center;border:1px solid ${b.earned?'rgba(201,168,76,0.3)':'rgba(255,255,255,0.05)'};${b.earned?'background:rgba(201,168,76,0.06)':''}">
-      <div style="font-size:28px;margin-bottom:6px">${b.e}</div>
-      <div style="font-size:11px;font-weight:600;margin-bottom:3px">${b.n}</div>
-      <div style="font-size:9px;color:var(--gray)">${b.d}</div>
-      <div style="font-size:9px;margin-top:4px;color:${b.earned?'var(--green)':'var(--gray)'}">${b.earned?'✅ مكتسب':'🔒'}</div>
-    </div>`).join('');
-  document.getElementById('leaderboard').innerHTML=[
-    {n:'Ahmed M.',p:1240,r:1},{n:'Sara K.',p:980,r:2},{n:currentUser?.email?.split('@')[0]||'أنت',p:uPoints,r:3},{n:'Omar R.',p:320,r:4}
-  ].map(u=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:7px;margin-bottom:7px;background:var(--black-4);${u.r===3?'border:1px solid rgba(201,168,76,0.2)':''}">
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;width:26px;text-align:center;color:${u.r===1?'var(--gold)':u.r===2?'#C0C0C0':u.r===3?'#CD7F32':'var(--gray)'}">${u.r}</div>
-      <div style="flex:1;font-size:13px;font-weight:600">${u.n} ${u.r===3?'👈':''}</div>
-      <div style="font-family:'Orbitron',monospace;font-size:12px;color:var(--gold)">${u.p}</div>
-    </div>`).join('');
-}
-
-// ===== SETTINGS =====
-function saveSettings() {
-  uCapital=parseFloat(document.getElementById('uCap').value)||0;
-  uRisk=document.getElementById('uRisk').value;
-  saveUserData(); buildMarket(); buildSummary();
-  showNotif('✅ تم الحفظ!',`رأس المال: $${uCapital.toLocaleString()}`);
-}
-
-// ===== REFERRAL =====
-function copyRef() {
-  const code=document.getElementById('refCode').textContent;
-  navigator.clipboard?.writeText(`eamtrading.netlify.app?ref=${code}`);
-  showNotif('📋 تم النسخ!','رابط الإحالة في الحافظة');
-}
-
-// ===== NOTIFICATIONS =====
-function showNotif(title,body) {
-  document.getElementById('notifT').textContent=title;
-  document.getElementById('notifB').textContent=body;
-  const n=document.getElementById('notif');
-  n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'),4000);
-}
-
-// ===== PRICE UPDATES =====
-function updatePrices() {
-  coins.forEach(c=>{
-    c.price*=(1+(Math.random()-0.5)*0.003);
-    c.price=parseFloat(c.price.toFixed(c.price>100?2:4));
-    c.change=parseFloat((c.change+(Math.random()-0.5)*0.1).toFixed(2));
-  });
-  buildTicker();
-  if(document.getElementById('page-market').classList.contains('active')) buildMarket();
-  if(Math.random()<0.04) {
-    const opp=coins.find(c=>c.signal==='buy');
-    if(opp) showNotif(`🎯 فرصة ${opp.id}!`,`إشارة شراء عند $${opp.price.toLocaleString()}`);
+// ============ ADMIN ============
+function banUser(btn) {
+  const row = btn.closest('tr');
+  const statusCell = row.cells[3];
+  if (btn.textContent==='حظر') {
+    statusCell.innerHTML = '<span class="status-badge loss">محظور</span>';
+    btn.textContent = 'رفع الحظر';
+    showToast('🚫','تم الحظر','تم حظر المستخدم بنجاح');
+  } else {
+    statusCell.innerHTML = '<span class="status-badge open">نشط</span>';
+    btn.textContent = 'حظر';
+    showToast('✅','تم الرفع','تم رفع الحظر عن المستخدم');
   }
 }
 
-// ===== MODAL =====
-document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function saveAdminSettings() {
+  showToast('✅','تم الحفظ','تم تطبيق إعدادات الموقع');
+}
 
-// ===== INIT =====
-initAuth();
+function sendBroadcast(type) {
+  const title = document.getElementById('broadcastTitle').value;
+  if (!title) { showToast('⚠️','تنبيه','أدخل عنوان الإشعار أولاً'); return; }
+  showToast('📤','تم الإرسال', type==='test'?'تم الإرسال كاختبار':'تم إرسال الإشعار لجميع المستخدمين');
+  document.getElementById('broadcastTitle').value = '';
+  document.getElementById('broadcastMsg').value = '';
+}
+
+function setThemeColor(color) {
+  document.documentElement.style.setProperty('--gold', color);
+  document.documentElement.style.setProperty('--gold2', color);
+  showToast('🎨','تم التغيير','تم تطبيق اللون الجديد');
+}
+
+// ============ MISC ============
+function updateCapital() {
+  const val = parseFloat(document.getElementById('capitalInput').value);
+  if (!val) return;
+  currentUser.capital = val;
+  document.getElementById('capitalVal').textContent = '$'+val.toLocaleString();
+  showToast('✅','تم الحفظ','تم تحديث رأس المال');
+}
+
+function saveSettings() {
+  const name = document.getElementById('settingName').value;
+  const cap  = document.getElementById('settingCapital').value;
+  if (name) { currentUser.name = name; document.getElementById('userNameNav').textContent = name; document.getElementById('welcomeName').textContent = name; }
+  if (cap)  { currentUser.capital = parseFloat(cap); document.getElementById('capitalVal').textContent = '$'+parseFloat(cap).toLocaleString(); }
+  showToast('✅','تم الحفظ','تم تحديث إعداداتك');
+}
+
+function downloadReport() {
+  showToast('📄','جاري التحضير','سيتم تحميل التقرير كـ PDF قريباً');
+}
+
+function showReport(type) { showToast('📊','التقرير '+type,'جاري تحميل البيانات...'); }
+function filterTrades(type) {}
+function showAddTrade() { showToast('➕','إضافة صفقة','هذه الميزة ستكون متاحة قريباً'); }
+
+// ============ TOAST ============
+function showToast(icon, title, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
 </script>
 </body>
 </html>
